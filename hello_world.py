@@ -20,4 +20,4 @@ else:
         print("reprovado")
     else:
         print("aprovado")
-#Aqui eu peguei o arquivo do github e alterei no spyder.
+#Aqui eu peguei o arquivo do github e alterei no git bash
