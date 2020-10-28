@@ -21,3 +21,5 @@ else:
     else:
         print("aprovado")
 #Aqui eu peguei o arquivo do github e alterei no git bash
+for i in range(15):
+    print(i**2)
