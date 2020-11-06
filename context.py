@@ -3,8 +3,8 @@ import getpass
 
 if getpass.getuser() == "kadu":
     home_dir = "/home/kadu/Dropbox/splus-halpha"
-elif getpass.getuser() == "jessica":
-    home_dir = "C:/jessica/splus-halpha"
+elif getpass.getuser() == "55119":
+    home_dir = "/c/Users/55119/dropbox/splus-halpha"
 
 data_dir = os.path.join(home_dir, "data")
 if not os.path.exists(data_dir):

@@ -1,10 +1,8 @@
 """ Retrieves images from S-PLUS data server. """
+
 import os
-
 import splusdata
-
 import context
-
 if __name__ == "__main__":
     galaxies = ["galaxy0"]
     ras = [313.229166666667]
