@@ -12,8 +12,5 @@ if not os.path.exists(data_dir):
 
 bands = ['U', 'F378', 'F395', 'F410', 'F430', 'G', 'F515', 'R', 'F660', 'I',
          'F861', 'Z']
-<<<<<<< HEAD
-=======
 
 tables_dir = os.path.join(home_dir, "tables")
->>>>>>> e0e612189c11c14b4a0399fad07aedaff0e53a0e
