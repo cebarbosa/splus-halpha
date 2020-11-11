@@ -1,11 +1,12 @@
 """ Retrieves images from S-PLUS data server. """
+
+<<<<<<< HEAD
 import os
-
+=======
 from astropy.table import Table
+>>>>>>> e0e612189c11c14b4a0399fad07aedaff0e53a0e
 import splusdata
-
 import context
-
 if __name__ == "__main__":
     tablename = os.path.join(context.tables_dir, "kennicutt2008.fits")
     sample = Table.read(tablename)
