@@ -4,9 +4,17 @@ import numpy as np
 from astropy.io import fits
 import matplotlib.pyplot as plt
 
+import glob, os, sys, numpy as np, matplotlib.pyplot as plt
+from astropy.table import QTable
+from astropy.table import Table
+import matplotlib.pyplot as plt
+from astropy.io import fits
+import astropy.units as u
+import numpy as np
 import context
 
 def get_names(wdir):
+# wdir=pasta+nome da galaxia
     """ Obtaining names of images  for one directory. """
     filenames = [x for x in os.listdir(wdir) if x.endswith("_swp.fits")]
     names = []
@@ -36,8 +44,5 @@ for galaxy in galaxies:
     plt.imshow(fluxTwoBands, origin="lower", vmax=vmax, vmin=vmin)
     plt.colorbar()
     plt.show()
-
-
-
-
+                 
 
