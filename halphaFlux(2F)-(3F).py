@@ -54,10 +54,10 @@ for galaxy in galaxies:
     plt.show()
     
              #############   For 3 Filters    ####################
-    
-    COEFS=fits.open("file:///c:/Users/55119/Dropbox/splus-halpha (1)/tables/coeffs.fits")
+    coef_file = os.path.join(context.tables_dir, "coeffs.fits")
+    # COEFS=fits.open("file:///c:/Users/55119/Dropbox/splus-halpha (1)/tables/coeffs.fits")
    
-    t = Table.read(COEFS)
+    t = Table.read(coef_file)
     
     alpha_F660=t['alpha_x'][0]
     beta_F660=t['beta_x'][0]
