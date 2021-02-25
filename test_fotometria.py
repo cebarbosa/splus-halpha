@@ -31,9 +31,6 @@ def get_names(wdir):
 data_dir = os.path.join(context.data_dir, "11HUGS/cutouts")
 galaxies = os.listdir(data_dir)
 
-coef_F660 = 125.3
-coef_r = 1419.0
-
 for galaxy in galaxies:
     wdir = os.path.join(data_dir, galaxy)
     os.chdir(wdir)
