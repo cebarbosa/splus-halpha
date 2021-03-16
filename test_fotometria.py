@@ -39,7 +39,6 @@ for galaxy in galaxies:
     data = fits.getdata(imgnames[0], ext=1)
     
     #Creating Aperture Objects
-
     positions =  np.array([0.5 * data.shape[0], 0.5 * data.shape[1]])
     radii = np.linspace(1, data.shape[0] / 2., 30)
     # apertures = [CircularAperture(positions, r=r) for r in radii]

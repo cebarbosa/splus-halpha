@@ -61,26 +61,22 @@ for galaxy in galaxies:
     plt.colorbar()
     plt.show()
     
-<<<<<<< HEAD:halphaFlux(2F)-(3F).py
              #############   For 3 Filters    ####################
     coef_file = os.path.join(context.tables_dir, "coeffs.fits")
-    # COEFS=fits.open("file:///c:/Users/55119/Dropbox/splus-halpha (1)/tables/coeffs.fits")
-=======
 
 # For 3 Filters    
     
     COEFS=fits.open("file:///c:/Users/55119/Dropbox/splus-halpha (1)/tables/coeffs.fits")
->>>>>>> 695b70949227de6f4b5731924e700b884645d8e1:halpha_flux_images_method _two_and_three_filters.py
-   
+
     t = Table.read(coef_file)
     
     alpha_F660=t['alpha_x'][0]
     beta_F660=t['beta_x'][0]
     delta_F660=t['delta_x'][0]
 
-    alpha_I=t['alpha_x'][1]
+    alpha_i=t['alpha_x'][1]
     beta_I=t['beta_x'][1]
-    delta_I=t['delta_x'][1]
+    delta_I=i=t['delta_x'][1]
 
     alpha_R=t['alpha_x'][2]
     beta_R=t['beta_x'][2]
