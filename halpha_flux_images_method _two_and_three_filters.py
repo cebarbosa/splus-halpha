@@ -15,21 +15,18 @@ from astropy.table import Table
 import matplotlib.pyplot as plt
 from astropy.io import fits
 import astropy.units as u
-import numpy as np
 import splusdata
 import context
 
+
 def get_names(wdir):
-    
-    
-    
     
 # wdir=pasta+nome da galaxia
 
     """ Obtaining names of images  for one directory. """
     filenames = [x for x in os.listdir(wdir) if x.endswith("_swp.fits")]
     names = []
-    for band in ["R", "F660", "I"]:
+    for band in ["R"]:
         names.append([x for x in filenames if x.split("_")[2]==band][0])
     return names
 
@@ -75,20 +72,21 @@ for galaxy in galaxies:
     delta_F660=t['delta_x'][0]
 
     alpha_i=t['alpha_x'][1]
-    beta_I=t['beta_x'][1]
-    delta_I=i=t['delta_x'][1]
+    beta_i=t['beta_x'][1]
+    delta_i=i=t['delta_x'][1]
 
-    alpha_R=t['alpha_x'][2]
-    beta_R=t['beta_x'][2]
-    delta_R=t['delta_x'][2]
+    alpha_r=t['alpha_x'][2]
+    beta_r=t['beta_x'][2]
+    delta_r=t['delta_x'][2]
 
     flux_three_bands = (((fnu_r- fnu_i)-((alpha_r-alpha_i)/(alpha_F660 - alpha_i))*(fnu_F660 - fnu_i))/((beta_F660)*(alpha_i -alpha_r )-(beta_r)))
     
    # fluxThreeBands = (((fnu_R- fnu_I)-((t['alpha_x'][2])-(t['alpha_x'][1]))/((t['alpha_x'][0] )- (t['alpha_x'][2]))*(fnu_F660 - fnu_I))/(((t['beta_x'][0]))*((t['alpha_x'][1]) - (t['alpha_x'][2]) )-((t['beta_x'][2))))
     vmax = np.nanpercentile(flux_three_bands, 95)
-    vmin = np.nanpercentile(flux_three_bandss, 80)
+    vmin = np.nanpercentile(flux_three_bands, 80)
     plt.imshow(flux_three_bands, origin="lower", vmax=vmax, vmin=vmin)
     plt.colorbar()
     plt.show()
     
+ 
     
