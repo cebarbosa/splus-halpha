@@ -41,7 +41,8 @@ for galaxy in galaxies:
     # Loading data
     data = fits.getdata(imgnames[0], ext=1)
        
-    mean, median, std = sigma_clipped_stats(data, sigma=3.0) 
+    mean, median, std = sigma_clipped_stats(data, sigma=3.0)
+    print(mean, median, std)
     #print((mean, median, std)) 
     
     daofind = DAOStarFinder(fwhm=3.0, threshold=5.*std) 
@@ -59,29 +60,29 @@ for galaxy in galaxies:
     stars = sources[idx]
     
     img = plt.imshow(data - median, origin="lower")
-    for star in stars:
-        plt.plot(star["xcentroid"], star["ycentroid"], "xr")
-    #plt.colorbar(img)
-    #plt.show()
+    # for star in stars:
+    #     plt.plot(star["xcentroid"], star["ycentroid"], "xr")
+    # plt.colorbar(img)
+    # plt.show()
     
     x = np.arange(xdim)
     y = np.arange(ydim)
     xx, yy = np.meshgrid(x, y)
     
-    mask = np.zeros_like(data)
-    rstars = 6
+    mask = np.zeros_like(data).astype(np.bool)
+    rstars = 15
     for star in stars:
         r = np.sqrt((xx - star["xcentroid"])**2 + \
                (yy - star["ycentroid"])**2)
-    idx = np.where(r < rstars)
-    mask[idx] = 2
-   # plt.imshow(mask, origin="lower")
-   # plt.colorbar()
-   # plt.show()
+        idx = np.where(r < rstars)
+        mask[idx] = True
+    # plt.imshow(mask, origin="lower")
+    # plt.colorbar()
+    # plt.show()
     
-    masked_data = data[:]
-    masked_data[mask==1] = median
-    plt.imshow(masked_data, origin="lower")
+    masked_data = data[:] - median
+    plt.imshow(masked_data, origin="lower",
+               vmax=np.percentile(masked_data, 99.9))
     plt.colorbar()
     plt.show()
 
@@ -94,8 +95,9 @@ for galaxy in galaxies:
         aperture = CircularAperture(positions, r=r)
         apertures.append(aperture)
     # Performing Aperture Photometry
-    phot_table = aperture_photometry(data, apertures)
+    phot_table = aperture_photometry(masked_data, apertures, mask=mask)
     # Lendo os valores da table
-    phot = [float(phot_table["aperture_sum_{}".format(i)]) for i in range(30)]
+    phot = [-2.5 * np.log10(float(phot_table["aperture_sum_{}".format(i)]))
+            for i in range(30)]
     plt.plot(radii, phot, "o")
     plt.show()
