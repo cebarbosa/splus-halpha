@@ -26,7 +26,7 @@ def get_names(wdir):
     """ Obtaining names of images  for one directory. """
     filenames = [x for x in os.listdir(wdir) if x.endswith("_swp.fits")]
     names = []
-    for band in ["R"]:
+    for band in ["R","I","F660"]:
         names.append([x for x in filenames if x.split("_")[2]==band][0])
     return names
 

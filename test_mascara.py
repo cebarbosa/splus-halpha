@@ -27,7 +27,7 @@ def get_names(wdir):
     """ Obtaining names of images  for one directory. """
     filenames = [x for x in os.listdir(wdir) if x.endswith("_swp.fits")]
     names = []
-    for band in ["R"]:
+    for band in ["R","I","F660"]:
         names.append([x for x in filenames if x.split("_")[2]==band][0])
     return names
 
@@ -40,11 +40,11 @@ for galaxy in galaxies:
     imgnames = get_names(wdir)
     # Loading data
     data = fits.getdata(imgnames[0], ext=1)
-       
+
     mean, median, std = sigma_clipped_stats(data, sigma=3.0)
     print(mean, median, std)
     #print((mean, median, std)) 
-    
+    #daofind= detecta automaticamente objetos em uma imagem
     daofind = DAOStarFinder(fwhm=3.0, threshold=5.*std) 
     sources = daofind(data - median) 
     #print(sources)
@@ -55,7 +55,7 @@ for galaxy in galaxies:
     r = np.sqrt((sources["xcentroid"]- x0)**2 + \
             (sources["ycentroid"] - y0)**2).data
    # print(r)
-    idx = np.where(r >= 100)
+    idx = np.where(r >= 103)
     
     stars = sources[idx]
     
@@ -85,6 +85,8 @@ for galaxy in galaxies:
                vmax=np.percentile(masked_data, 99.9))
     plt.colorbar()
     plt.show()
+
+
 
  #Creating Aperture Objects
     positions =  np.array([0.5 * data.shape[0], 0.5 * data.shape[1]])
