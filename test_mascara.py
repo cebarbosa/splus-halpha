@@ -122,7 +122,7 @@ for galaxy in galaxies:
     plt.xlabel("Raio (pixels)")
     plt.ylabel("$\Delta$ mag")
     plt.ylim(-0.6, 0.6)
-    plt.savefig(os.path.join(context.home_dir, "curva_de_crescimento.png"))
     plt.tight_layout()
+    plt.savefig(os.path.join(context.home_dir, "curva_de_crescimento.png"))
     plt.show()
     break
