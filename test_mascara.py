@@ -21,6 +21,7 @@ from photutils import CircularAperture, CircularAnnulus
 from astropy.stats import sigma_clipped_stats
 from photutils import datasets
 from photutils import DAOStarFinder
+from matplotlib.colors import LogNorm
 
 def get_names(wdir):
 # wdir=pasta+nome da galaxia
@@ -40,6 +41,8 @@ for galaxy in galaxies:
     imgnames = get_names(wdir)
     # Loading data
     data = fits.getdata(imgnames[0], ext=1)
+    vmin = np.percentile(data, 2)
+    vmax = np.percentile(data, 98.)
 
     mean, median, std = sigma_clipped_stats(data, sigma=3.0)
     print(mean, median, std)
@@ -59,11 +62,15 @@ for galaxy in galaxies:
     
     stars = sources[idx]
     
-    img = plt.imshow(data - median, origin="lower")
+    img = plt.imshow(data, origin="lower", vmin=vmin, vmax=vmax)
     # for star in stars:
-    #     plt.plot(star["xcentroid"], star["ycentroid"], "xr")
-    # plt.colorbar(img)
-    # plt.show()
+    #     plt.scatter(star["xcentroid"], star["ycentroid"],
+    #              color='none', edgecolor="r")
+    cbar = plt.colorbar(img)
+    cbar.set_label("Fluxo instrumental")
+    plt.tight_layout() # Usar bordas de maneira mais eficientemente.
+    plt.savefig(os.path.join(context.home_dir, "ngc3115_nomask.png"))
+    plt.show()
     
     x = np.arange(xdim)
     y = np.arange(ydim)
@@ -80,13 +87,14 @@ for galaxy in galaxies:
     # plt.colorbar()
     # plt.show()
     
-    masked_data = data[:] - median
-    plt.imshow(masked_data, origin="lower",
-               vmax=np.percentile(masked_data, 99.9))
-    plt.colorbar()
+    masked_data = data[:]
+    masked_data[mask] = median # Mascarando dados para plot
+    plt.imshow(masked_data, origin="lower", vmax=vmax, vmin=vmin)
+    cbar = plt.colorbar()
+    cbar.set_label("Fluxo instrumental")
+    plt.tight_layout() # Usar bordas de maneira mais eficientemente.
+    plt.savefig(os.path.join(context.home_dir, "ngc3115_mask.png"))
     plt.show()
-
-
 
  #Creating Aperture Objects
     positions =  np.array([0.5 * data.shape[0], 0.5 * data.shape[1]])
@@ -101,5 +109,20 @@ for galaxy in galaxies:
     # Lendo os valores da table
     phot = [-2.5 * np.log10(float(phot_table["aperture_sum_{}".format(i)]))
             for i in range(30)]
+    fig = plt.figure(figsize=(3.54, 4))
+    plt.subplot(211)
     plt.plot(radii, phot, "o")
+    plt.ylim(plt.ylim()[::-1]) # Inverter y-axis
+
+    plt.ylabel("Magnitude instrumental")
+    plt.ylim(-13, -15.5)
+    plt.subplot(212)
+    plt.plot(radii[:-1] + np.diff(radii), np.diff(phot), "o")
+    plt.axhline(y=0, ls="--", c="k")
+    plt.xlabel("Raio (pixels)")
+    plt.ylabel("$\Delta$ mag")
+    plt.ylim(-0.6, 0.6)
+    plt.savefig(os.path.join(context.home_dir, "curva_de_crescimento.png"))
+    plt.tight_layout()
     plt.show()
+    break
