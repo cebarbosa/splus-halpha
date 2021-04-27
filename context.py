@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 if getpass.getuser() == "kadu":
     home_dir = "/home/kadu/Dropbox/splus-halpha"
 elif getpass.getuser() == "55119":
-    home_dir = "C:/Users/55119/Dropbox/splus-halpha (1)"
+    home_dir = "C:\Users\amori\Dropbox\splus-halpha (1)"
 
 data_dir = os.path.join(home_dir, "data")
 if not os.path.exists(data_dir):

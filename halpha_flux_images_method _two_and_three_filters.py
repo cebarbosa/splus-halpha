@@ -17,6 +17,7 @@ from astropy.io import fits
 import astropy.units as u
 import splusdata
 import context
+import math
 
 
 def get_names(wdir):
@@ -80,7 +81,9 @@ for galaxy in galaxies:
     delta_r=t['delta_x'][2]
 
     flux_three_bands = (((fnu_r- fnu_i)-((alpha_r-alpha_i)/(alpha_F660 - alpha_i))*(fnu_F660 - fnu_i))/((beta_F660)*(alpha_i -alpha_r )-(beta_r)))
-    
+
+    math.log(haplha)=(0.989*(math.log(flux_three_bands)))− 0.193
+
    # fluxThreeBands = (((fnu_R- fnu_I)-((t['alpha_x'][2])-(t['alpha_x'][1]))/((t['alpha_x'][0] )- (t['alpha_x'][2]))*(fnu_F660 - fnu_I))/(((t['beta_x'][0]))*((t['alpha_x'][1]) - (t['alpha_x'][2]) )-((t['beta_x'][2))))
     vmax = np.nanpercentile(flux_three_bands, 95)
     vmin = np.nanpercentile(flux_three_bands, 80)
