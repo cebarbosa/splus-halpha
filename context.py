@@ -1,12 +1,14 @@
 import os
 import getpass
-
+from sys import argv
 import matplotlib.pyplot as plt
 
+
+home_dir= []
 if getpass.getuser() == "kadu":
     home_dir = "/home/kadu/Dropbox/splus-halpha"
-elif getpass.getuser() == "55119":
-    home_dir = "C:\Users\amori\Dropbox\splus-halpha (1)"
+elif getpass.getuser() == "amori":
+    home_dir = "c:/Users/amori/Dropbox/splus-halpha (1)"
 
 data_dir = os.path.join(home_dir, "data")
 if not os.path.exists(data_dir):

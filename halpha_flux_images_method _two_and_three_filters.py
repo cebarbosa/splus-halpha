@@ -52,7 +52,9 @@ for galaxy in galaxies:
     fnu_r = fnu[0]
     fnu_i= fnu[2]
     flux_two_bands = np.dot(coef_F660,((fnu_F660 - fnu_r)/(1-(coef_F660/coef_r))))
-    
+
+    flux= (0.954 * log(fnu_F660) − 0.753)
+
     vmax = np.nanpercentile(flux_two_bands, 95)
     vmin = np.nanpercentile(flux_two_bands, 80)
     plt.imshow(flux_two_bands, origin="lower", vmax=vmax, vmin=vmin)
@@ -82,7 +84,7 @@ for galaxy in galaxies:
 
     flux_three_bands = (((fnu_r- fnu_i)-((alpha_r-alpha_i)/(alpha_F660 - alpha_i))*(fnu_F660 - fnu_i))/((beta_F660)*(alpha_i -alpha_r )-(beta_r)))
 
-    math.log(haplha)=(0.989*(math.log(flux_three_bands)))− 0.193
+   # halpha_2=((0.989*(math.log(flux_three_bands))) − 0.193)
 
    # fluxThreeBands = (((fnu_R- fnu_I)-((t['alpha_x'][2])-(t['alpha_x'][1]))/((t['alpha_x'][0] )- (t['alpha_x'][2]))*(fnu_F660 - fnu_I))/(((t['beta_x'][0]))*((t['alpha_x'][1]) - (t['alpha_x'][2]) )-((t['beta_x'][2))))
     vmax = np.nanpercentile(flux_three_bands, 95)
