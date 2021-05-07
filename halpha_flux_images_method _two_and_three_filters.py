@@ -61,8 +61,7 @@ for galaxy in galaxies:
     plt.colorbar()
     plt.show()
     
-########################################   For 3 Filters    ####################################################
-def three_filters():  
+########################################   For 3 Filters    ####################################################  
     coef_file = os.path.join(context.tables_dir, "coeffs.fits")
 
 
@@ -90,21 +89,12 @@ def three_filters():
                         #  0.954 * np.log10(fnu_F660_corr.value)-0.193)
 
    # fluxThreeBands = (((fnu_R- fnu_I)-((t['alpha_x'][2])-(t['alpha_x'][1]))/((t['alpha_x'][0] )- (t['alpha_x'][2]))*
-    # (fnu_F660 - fnu_I))/(((t['beta_x'][0]))*((t['alpha_x'][1]) - (t['alpha_x'][2]) )-((t['beta_x'][2))))
-    return flux_three_bands
-
-def nii_correction():
-    g_i=[]
-   # gi -= np.array([t["{}{}".format(band, magkey)].data for band in bands_ebv])
-   # g_i = gi[0] - gi[1]
-    log_halpha = np.where(g_i <=0.5,
-                          0.989 * np.log10(fnu_F660_corr.value)-0.193,
-                          0.954 * np.log10(fnu_F660_corr.value)-0.193)
-    return log_halpha
+   # (fnu_F660 - fnu_I))/(((t['beta_x'][0]))*((t['alpha_x'][1]) - (t['alpha_x'][2]) )-((t['beta_x'][2))))
 
     vmax = np.nanpercentile(flux_three_bands, 95)
     vmin = np.nanpercentile(flux_three_bands, 80)
     plt.imshow(flux_three_bands, origin="lower", vmax=vmax, vmin=vmin)
     plt.colorbar()
     plt.show()
+    
     
