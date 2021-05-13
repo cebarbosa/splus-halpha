@@ -54,12 +54,12 @@ def nii_correction(log_halpha,fnu_F660_corr):
     g_i=[]
     fnu_F660_corr= 2* fnu_F660
     log_halpha = np.where(g_i <=0.5,
-                          0.989 * np.log10(fnu_F660_corr0.193,
+                          0.989 * np.log10(fnu_F660_corr) - 193,
                           0.954 * np.log10(fnu_F660_corr)-0.193)
-    print log_halpha
+    return log_halpha
 
-    vmax = np.nanpercentile(flux_three_bands, 95)
-    vmin = np.nanpercentile(flux_three_bands, 80)
+    vmax = np.nanpercentile(log_halpha , 95)
+    vmin = np.nanpercentile(log_halpha , 80)
     plt.imshow(flux_three_bands, origin="lower", vmax=vmax, vmin=vmin)
     plt.colorbar()
     plt.show()

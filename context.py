@@ -21,8 +21,8 @@ tables_dir = os.path.join(home_dir, "tables")
 
 # Matplotlib settings
 plt.style.context("seaborn-paper")
-plt.rcParams["text.usetex"] = True
-plt.rcParams["font.family"] = "serif"
+plt.rcParams["text.usetex"] = False
+plt.rcParams["font.family"] = "sans-serif"
 plt.rcParams['font.serif'] = 'Computer Modern'
 plt.rcParams["xtick.direction"] = "in"
 plt.rcParams["ytick.direction"] = "in"

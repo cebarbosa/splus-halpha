@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Jan 26 16:58:48 2021
+Created on Mon May 10 22:45:35 2021
 
-@author: 55119
+@author: amori
 """
-
 import os
 import sys
 import glob
@@ -17,6 +16,7 @@ from astropy.table import Table
 import matplotlib.pyplot as plt
 
 import context
+import halpha_flux_images_method_two_and_three_filters
 
 
 
@@ -85,8 +85,9 @@ for galaxy in galaxies:
                          (fnu_F660 - fnu_i))/((beta_F660)*(alpha_i -alpha_r )-(beta_r)))
 
     #log_halpha = np.where(g_i <=0.5,
-                        #  0.989 * np.log10(fnu_F660_corr.value)-0.193,
-                        #  0.954 * np.log10(fnu_F660_corr.value)-0.193)
+                          #0.989 * np.log10(fnu_F660_corr.value)-0.193,
+                          #0.954 * np.log10(fnu_F660_corr.value)-0.193)
+    #print( log_halpha)
 
    # fluxThreeBands = (((fnu_R- fnu_I)-((t['alpha_x'][2])-(t['alpha_x'][1]))/((t['alpha_x'][0] )- (t['alpha_x'][2]))*
    # (fnu_F660 - fnu_I))/(((t['beta_x'][0]))*((t['alpha_x'][1]) - (t['alpha_x'][2]) )-((t['beta_x'][2))))
@@ -96,5 +97,3 @@ for galaxy in galaxies:
     plt.imshow(flux_three_bands, origin="lower", vmax=vmax, vmin=vmin)
     plt.colorbar()
     plt.show()
-    
-    
