@@ -17,37 +17,12 @@ from astropy.table import QTable
 from astropy.table import Table
 
 import context
-
+from test_halpha import get_names
 
 "[N ii] correction"
 
-def get_names(wdir):
-    filenames = [x for x in os.listdir(wdir) if x.endswith("_swp.fits")]
-    names = []
-    for band in ["R","I","F660","G"]:
-        names.append([x for x in filenames if x.split("_")[2]==band][0])
-    return names
-
 coef_F660 = 125.3
 coef_r = 1419.0
-
-def read_galaxies(image):
-    
-    data_dir = os.path.join(context.data_dir, "11HUGS/cutouts")
-    galaxies = os.listdir(data_dir)
-    
-    for galaxy in galaxies:
-        wdir = os.path.join(data_dir, galaxy)
-        os.chdir(wdir)
-        imgnames = get_names(wdir)
-        #image=fits.open(imgnames)
-        # Loading data
-        data = np.array([fits.getdata(name, ext=1) for name in imgnames])
-        # Loading zero points
-        zero_point = np.array([fits.getval(name, "MAGZP", ext=1) for name in imgnames])
-        data_galaxies= fits.read(data)
-        fnu =  data * np.power(10, -0.4 * (zero_point[:, None, None] + 48.6))
-    return fnu
 
 
 def three_filters(fnu):
@@ -57,7 +32,7 @@ def three_filters(fnu):
     fnu_F660_corr= 2* fnu_F660
     
     coef_file = os.path.join(context.tables_dir, "coeffs.fits")
-    COEFS=fits.open("file:///c:/Users/amori/Dropbox/splus-halpha (1)/tables/coeffs.fits")
+    COEFS=fits.open(coef_file)
 
     t = Table.read(coef_file)
     alpha_F660=t['alpha_x'][0]
@@ -77,23 +52,43 @@ def three_filters(fnu):
     
     return flux_three_bands
 
-def corretion_nii(fnu_F660_corr):
-    log_halpha = np.where(("G" - "I") <=0.5,
-                          0.989 * np.log10(fnu_F660_corr.value)-0.193,
-                          0.954 * np.log10(fnu_F660_corr.value)-0.193)
-    #output_name = calcular_correçao_nii
-    #correcao= log_halpha.read()
+def corretion_nii(halpha_nii, g_i):
+    log_halpha = np.where(g_i <= 0.5,
+                          0.989 * np.log10(halpha_nii)-0.193,
+                          0.954 * np.log10(halpha_nii)-0.193)
     return log_halpha
 
 def save_the_disk(correcao,output_name):
     save_the_disk
     
-def plot_corretion(log_halpha):
+def plot_corretion(log_halpha, g_i):
     vmax = np.nanpercentile(log_halpha, 95)
     vmin = np.nanpercentile(log_halpha, 80)
-    plt.imshow(log_halpha, origin="lower", vmax=vmax, vmin=vmin)
-    plt.colorbar()
-    plote= plt.show()
     return plote
-    
-   
+
+def process_galaxies():
+    data_dir = os.path.join(context.data_dir, "11HUGS/cutouts")
+    galaxies = os.listdir(data_dir)
+    for galaxy in galaxies:
+        wdir = os.path.join(data_dir, galaxy)
+        os.chdir(wdir)
+        imgnames = get_names(wdir, bands=["R","F660","I","G"])
+        # image=fits.open(imgnames)
+        # Loading data
+        data = np.array([fits.getdata(name, ext=1) for name in imgnames])
+        # Loading zero points
+        zero_point = np.array(
+            [fits.getval(name, "MAGZP", ext=1) for name in imgnames])
+        fnu = data * np.power(10, -0.4 * (zero_point[:, None, None] + 48.6))
+        halpha_nii = three_filters(fnu)
+        magAB = -2.5 * np.log10(fnu) - 48.6
+        r = np.power(10, -0.4 * (fnu[3]/fnu[2]))
+        rcut = np.power(10, -0.4 * 0.5)
+        condition = np.where(r <= rcut, 1, 0)
+        plt.imshow(condition, origin="lower")
+        plt.colorbar()
+        plt.show()
+
+
+if __name__ == "__main__":
+    process_galaxies()
