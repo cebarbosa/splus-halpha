@@ -40,8 +40,8 @@ if __name__ == "__main__":
         fluxTwoBands = coef_F660 * (F660 - R) / (1-(coef_F660/coef_R))
         vmax = np.nanpercentile(fluxTwoBands, 95)
         vmin = np.nanpercentile(fluxTwoBands, 80)
-        plt.imshow(fluxTwoBands, origin="lower", vmax=vmax, vmin=vmin)
-        plt.colorbar()
-        plt.show()
+        # plt.imshow(fluxTwoBands, origin="lower", vmax=vmax, vmin=vmin)
+        # plt.colorbar()
+        # plt.show()
 
 
