@@ -1,16 +1,10 @@
+
 import os
 
-import numpy as np
 from astropy.io import fits
+import numpy as np
 import matplotlib.pyplot as plt
 
-import glob, os, sys, numpy as np, matplotlib.pyplot as plt
-from astropy.table import QTable
-from astropy.table import Table
-import matplotlib.pyplot as plt
-from astropy.io import fits
-import astropy.units as u
-import numpy as np
 import context
 
 def get_names(wdir, bands=["R", "F660", "I"]):
@@ -40,8 +34,8 @@ if __name__ == "__main__":
         fluxTwoBands = coef_F660 * (F660 - R) / (1-(coef_F660/coef_R))
         vmax = np.nanpercentile(fluxTwoBands, 95)
         vmin = np.nanpercentile(fluxTwoBands, 80)
-        # plt.imshow(fluxTwoBands, origin="lower", vmax=vmax, vmin=vmin)
-        # plt.colorbar()
-        # plt.show()
+        plt.imshow(fluxTwoBands, origin="lower", vmax=vmax, vmin=vmin)
+        plt.colorbar()
+        plt.show()
 
 
