@@ -86,6 +86,16 @@ def process_galaxies():
         dust_correction = extinction.calzetti00(wave, 3.8, 4.05)
         print ("dust_correction",dust_correction)
         ######################################################################
+        #""" astropy (wcs)"""
+        #w = WCS(data[1].header)
+        #xdim, ydim = data.shape
+        #x0 = xdim / 2.
+        #y0 = ydim / 2.
+        #sky = w.pixel_to_world(x0, y0)
+        #xdim, ydim = data.shape
+        #x0, y0 = w.world_to_pixel(sky)
+        #print ("x0, y0=", x0, y0)
+         
         magAB = -2.5 * np.log10(fnu) - 48.6
         g_i = magAB[3] - magAB[2]
         
