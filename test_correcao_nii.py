@@ -82,9 +82,6 @@ def process_galaxies():
         ######################################################################
         # dust correction
         """extinction.calzetti00 with with A_V = 3.8 and R_V = 4.05 +-0.80"""
-        #A_V = 3.8
-        #R_V = 4.05
-        #E(B_V) = A_V /R_V 
         wave = np.array([6266.6, 6614.0, 7683.8])
         dust_correction = extinction.calzetti00(wave, 3.8, 4.05)
         print ("dust_correction",dust_correction)
