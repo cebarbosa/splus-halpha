@@ -17,6 +17,11 @@ if not os.path.exists(data_dir):
 bands = ['U', 'F378', 'F395', 'F410', 'F430', 'G', 'F515', 'R', 'F660', 'I',
          'F861', 'Z']
 
+wave_eff = {"F378": 3773.4, "F395": 3940.8, "F410": 4895.4,
+            "F430": 4292.5, "F515": 5133.5, "F660": 6614.0, "F861": 8608.1,
+            "G": 4647.8, "I": 7683.8, "R": 6266.6, "U": 3536.5,
+            "Z": 8679.5}
+
 tables_dir = os.path.join(home_dir, "tables")
 
 # Matplotlib settings

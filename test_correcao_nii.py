@@ -9,13 +9,16 @@ import os
 
 import numpy as np
 import matplotlib.pyplot as plt
+import extinction
 from astropy.io import fits
+from astropy.wcs import WCS
 from astropy.table import Table
 
 import context
 from test_halpha import get_names
 
-def three_filters(fnu):
+def calc_halpha_nii_3F(fnu):
+    """ Calculates Halpha with 3 bands using eq. 3 of Vilella- Rojo (2015)."""
     fnu_F660 = fnu[1]
     fnu_r = fnu[0]
     fnu_i= fnu[2]
@@ -27,27 +30,32 @@ def three_filters(fnu):
     t = Table.read(coef_file)
     alpha_F660=t['alpha_x'][0]
     beta_F660=t['beta_x'][0]
-    delta_F660=t['delta_x'][0]
+    #delta_F660=t['delta_x'][0]
 
     alpha_i=t['alpha_x'][1]
     beta_i=t['beta_x'][1]
-    delta_i=i=t['delta_x'][1]
+    #delta_i=i=t['delta_x'][1]
 
     alpha_r=t['alpha_x'][2]
     beta_r=t['beta_x'][2]
-    delta_r=t['delta_x'][2]
-
-    flux_three_bands = (((fnu_r- fnu_i)-((alpha_r-alpha_i)/(alpha_F660 -alpha_i))*
-                         (fnu_F660 - fnu_i))/((beta_F660)*(alpha_i -alpha_r )-(beta_r)))
+    #delta_r=t['delta_x'][2]
     
-    return flux_three_bands
+    a =(alpha_r- alpha_i) / (alpha_F660 - alpha_i)
+    numen = (fnu_r - fnu_i) - a * (fnu_F660 - fnu_i)
+    denon = - a * beta_F660 + beta_r
+    return numen / denon 
 
-def corretion_nii(halpha_nii, g_i):
+def calc_halpha_corrected(halpha_nii, g_i):
+    """" Calculated NII corrected emission with eq. 21 or Vilella-Rojo+ (2015)"""
+    y =halpha_nii
+    vmin = np.nanpercentile(y, 10)
+    vmax = np.nanpercentile(y, 90)
+    plt.imshow(y, vmin=vmin, vmax=vmax, origin="lower")
+    plt.show()
     log_halpha = np.where(g_i <= 0.5,
-                          0.989 * np.log10(halpha_nii)-0.193,
-                          0.954 * np.log10(halpha_nii)-0.193)
-    return log_halpha
-
+                          0.989 * np.power(10, halpha_nii)- 0.193,
+                          0.954 * np.power(10, halpha_nii)- 0.193)
+    return np.power(10, log_halpha)
 # def save_the_disk(correcao,output_name):
 #     save_the_disk
 #
@@ -70,15 +78,27 @@ def process_galaxies():
         zero_point = np.array(
             [fits.getval(name, "MAGZP", ext=1) for name in imgnames])
         fnu = data * np.power(10, -0.4 * (zero_point[:, None, None] + 48.6))
-        halpha_nii = three_filters(fnu)
+        halpha_nii = calc_halpha_nii_3F(fnu)
+        ######################################################################
+        # dust correction
+        """extinction.calzetti00 with with A_V = 3.8 and R_V = 4.05 +-0.80"""
+        #A_V = 3.8
+        #R_V = 4.05
+        #E(B_V) = A_V /R_V 
+        wave = np.array([6266.6, 6614.0, 7683.8])
+        dust_correction = extinction.calzetti00(wave, 3.8, 4.05)
+        print ("dust_correction",dust_correction)
+        ######################################################################
         magAB = -2.5 * np.log10(fnu) - 48.6
         g_i = magAB[3] - magAB[2]
-        vmin = np.nanpercentile(halpha_nii, 10)
-        vmax = np.nanpercentile(halpha_nii, 90)
-        # print(vmin, vmax)
-        # plt.imshow(halpha_nii, origin="lower", vmin=vmin, vmax=vmax)
-        # plt.colorbar()
-        # plt.show()
+        
+        halpha = calc_halpha_corrected(halpha_nii, g_i)
+        
+        vmin = np.nanpercentile(halpha, 10)
+        vmax = np.nanpercentile(halpha, 90)
+        plt.imshow(halpha, vmin=vmin, vmax=vmax, origin="lower")
+        plt.show()
+        
         condition = np.where(g_i < 0.5, 1, 0)
         plt.imshow(condition)
         plt.show()

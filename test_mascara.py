@@ -13,7 +13,6 @@ from astropy.table import Table
 import matplotlib.pyplot as plt
 from astropy.io import fits
 import astropy.units as u
-import context
 from photutils import CircularAperture
 from photutils import aperture_photometry
 from photutils.datasets import make_100gaussians_image
@@ -22,6 +21,8 @@ from astropy.stats import sigma_clipped_stats
 from photutils import datasets
 from photutils import DAOStarFinder
 from matplotlib.colors import LogNorm
+
+import context
 
 def get_names(wdir):
 # wdir=pasta+nome da galaxia
