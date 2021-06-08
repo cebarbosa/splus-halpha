@@ -4,7 +4,10 @@ Created on Wed May 12 00:01:03 2021
 
 @author: amori
 """
+"""TER UM NOVO HALPHA CORRIGIDO EM TERMOS DO FLUXO DO CÉU PARA
+CORRIGIR O NII
 
+Dust correction and [N ii] removal """
 import os
 
 import numpy as np
@@ -52,6 +55,7 @@ def calc_halpha_corrected(halpha_nii, g_i):
     vmax = np.nanpercentile(y, 90)
     plt.imshow(y, vmin=vmin, vmax=vmax, origin="lower")
     plt.show()
+   
     log_halpha = np.where(g_i <= 0.5,
                           0.989 * np.power(10, halpha_nii)- 0.193,
                           0.954 * np.power(10, halpha_nii)- 0.193)
@@ -81,10 +85,8 @@ def process_galaxies():
         halpha_nii = calc_halpha_nii_3F(fnu)
         ######################################################################
         # dust correction
-        """extinction.calzetti00 with with A_V = 3.8 and R_V = 4.05 +-0.80"""
-        wave = np.array([6266.6, 6614.0, 7683.8])
-        dust_correction = extinction.calzetti00(wave, 3.8, 4.05)
-        print ("dust_correction",dust_correction)
+        
+        
         ######################################################################
         #""" astropy (wcs)"""
         #w = WCS(data[1].header)
@@ -95,9 +97,24 @@ def process_galaxies():
         #xdim, ydim = data.shape
         #x0, y0 = w.world_to_pixel(sky)
         #print ("x0, y0=", x0, y0)
-         
+        
         magAB = -2.5 * np.log10(fnu) - 48.6
         g_i = magAB[3] - magAB[2]
+        
+        """" C = E(B-V) extinction law  with  eq. 20 or Vilella-Rojo+ (2015)"""
+        c = np.array( 0.206 * np.power(g_i, 1.68) - 0.0457)
+        print(c)
+        R_V = 4.05
+    
+        A_V = np.array(R_V * c )
+        print("A_V =", A_V)
+        """TER UM NOVO HALPHA CORRIGIDO EM TERMOS DO 
+        FLUXO DO CÉU PARA CORRIGIR O NII
+
+        """" extinction.calzetti00 with A_V = R_V * c and R_V = 4.05 +-0.80 """
+        wave = np.array([6266.6, 6614.0, 7683.8])
+        dust_correction = extinction.calzetti00(wave, A_V, 4.05)
+        print ("dust_correction",dust_correction)
         
         halpha = calc_halpha_corrected(halpha_nii, g_i)
         
