@@ -13,6 +13,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import extinction
+import astropy.units as u
 from astropy.io import fits
 from astropy.wcs import WCS
 from astropy.table import Table
@@ -20,53 +21,42 @@ from astropy.table import Table
 import context
 from test_halpha import get_names
 
+
 def calc_halpha_nii_3F(fnu):
-    """ Calculates Halpha with 3 bands using eq. 3 of Vilella- Rojo (2015)."""
+    """ Calculates Halpha with 3 bands using eq. 3 of Vilella-Rojo+ (2015). """
     fnu_F660 = fnu[1]
     fnu_r = fnu[0]
-    fnu_i= fnu[2]
-    fnu_F660_corr= 2* fnu_F660
-    
+    fnu_i = fnu[2]
+    fnu_F660_corr = 2 * fnu_F660
+
     coef_file = os.path.join(context.tables_dir, "coeffs.fits")
-    COEFS=fits.open(coef_file)
+    COEFS = fits.open(coef_file)
 
     t = Table.read(coef_file)
-    alpha_F660=t['alpha_x'][0]
-    beta_F660=t['beta_x'][0]
-    #delta_F660=t['delta_x'][0]
+    alpha_F660 = t['alpha_x'][0]
+    beta_F660 = t['beta_x'][0]
+    delta_F660 = t['delta_x'][0]
 
-    alpha_i=t['alpha_x'][1]
-    beta_i=t['beta_x'][1]
-    #delta_i=i=t['delta_x'][1]
+    alpha_i = t['alpha_x'][1]
+    beta_i = t['beta_x'][1]
+    delta_i = i = t['delta_x'][1]
 
-    alpha_r=t['alpha_x'][2]
-    beta_r=t['beta_x'][2]
-    #delta_r=t['delta_x'][2]
-    
-    a =(alpha_r- alpha_i) / (alpha_F660 - alpha_i)
+    alpha_r = t['alpha_x'][2]
+    beta_r = t['beta_x'][2]
+    delta_r = t['delta_x'][2]
+
+    a = (alpha_r - alpha_i) / (alpha_F660 - alpha_i)
     numen = (fnu_r - fnu_i) - a * (fnu_F660 - fnu_i)
-    denon = - a * beta_F660 + beta_r
-    return numen / denon 
+    denom = - a * beta_F660 + beta_r
+    return numen / denom
 
-def calc_halpha_corrected(halpha_nii, g_i):
-    """" Calculated NII corrected emission with eq. 21 or Vilella-Rojo+ (2015)"""
-    y =halpha_nii
-    vmin = np.nanpercentile(y, 10)
-    vmax = np.nanpercentile(y, 90)
-    plt.imshow(y, vmin=vmin, vmax=vmax, origin="lower")
-    plt.show()
-   
-    log_halpha = np.where(g_i <= 0.5,
-                          0.989 * np.power(10, halpha_nii)- 0.193,
-                          0.954 * np.power(10, halpha_nii)- 0.193)
-    return np.power(10, log_halpha)
-# def save_the_disk(correcao,output_name):
-#     save_the_disk
-#
-# def plot_corretion(log_halpha, g_i):
-#     vmax = np.nanpercentile(log_halpha, 95)
-#     vmin = np.nanpercentile(log_halpha, 80)
-#     return plote
+
+def calc_halpha_without_nii(halpha_nii, g_i):
+    """ Calculated NII corrected emission with eq. 21 or Vilella-Rojo+ (2015)"""
+    halpha = np.where(g_i <= 0.5,
+                          np.power(halpha_nii, 0.989) * np.power(10, -0.193),
+                          np.power(halpha_nii, 0.954) * np.power(10, -0.753))
+    return halpha
 
 def process_galaxies():
     data_dir = os.path.join(context.data_dir, "11HUGS/cutouts")
@@ -100,40 +90,38 @@ def process_galaxies():
         
         magAB = -2.5 * np.log10(fnu) - 48.6
         g_i = magAB[3] - magAB[2]
-        
+        g_i[np.isnan(g_i)] = 0.1
+
+        wave = 6614.0 * u.Angstrom
         """" C = E(B-V) extinction law  with  eq. 20 or Vilella-Rojo+ (2015)"""
-        c = np.array( 0.206 * np.power(g_i, 1.68) - 0.0457)
-        print(c)
-        R_V = 4.05
-    
-        A_V = np.array(R_V * c )
-        print("A_V =", A_V)
+        ebv = np.array( 0.206 * np.power(g_i, 1.68) - 0.0457)
+        ebv[np.isnan(ebv)] = 0
+        x = 1 / wave.to(u.micrometer).value
+        wtran = (0.63 * u.micrometer)
+        kappa = np.where(wave > wtran, 2.659 * (-1.857 + 1.040 * x),
+                               2.659 * (-2.156 + 1.509 * x - 0.198 * x * x
+                                       + 0.011 * (x * x * x)))
+        dust_correction = np.power(10, -0.4 * ebv * kappa)
+        halpha_nii_corr = halpha_nii * dust_correction
+
         """TER UM NOVO HALPHA CORRIGIDO EM TERMOS DO 
         FLUXO DO CÉU PARA CORRIGIR O NII
 
         """" extinction.calzetti00 with A_V = R_V * c and R_V = 4.05 +-0.80 """
-        wave = np.array([6266.6, 6614.0, 7683.8])
-        dust_correction = extinction.calzetti00(wave, A_V, 4.05)
-        print ("dust_correction",dust_correction)
-        
-        halpha = calc_halpha_corrected(halpha_nii, g_i)
-        
-        vmin = np.nanpercentile(halpha, 10)
-        vmax = np.nanpercentile(halpha, 90)
+
+        halpha = calc_halpha_without_nii(halpha_nii_corr, g_i)
+        vmax = np.percentile(halpha_nii, 95)
+        vmin = np.percentile(halpha_nii, 10)
+        plt.subplot(1,3,1)
+        plt.imshow(halpha_nii, vmax=vmax, vmin=vmin, origin="lower")
+        plt.colorbar()
+        plt.subplot(1,3,2)
+        plt.imshow(halpha_nii_corr, vmax=vmax, vmin=vmin, origin="lower")
+        plt.colorbar()
+        plt.subplot(1,3,3)
         plt.imshow(halpha, vmin=vmin, vmax=vmax, origin="lower")
+        plt.colorbar()
         plt.show()
-        
-        condition = np.where(g_i < 0.5, 1, 0)
-        plt.imshow(condition)
-        plt.show()
-        # plt.imshow(g_i, origin="lower")
-        # plt.show()
-        # rcut = np.power(10, -0.4 * 0.5)
-        # condition = np.where(r <= rcut, 1, 0)
-        # fig = plt.figure(5)
-        # plt.imshow(r, origin="lower")
-        # plt.colorbar()
-        # plt.show()
 
 
 if __name__ == "__main__":
