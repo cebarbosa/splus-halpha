@@ -60,8 +60,6 @@ def calc_halpha_without_nii(halpha_nii, g_i):
                           0.954 * np.log10(halpha_nii) -0.753))
     halpha[idx] = halpha_nii[idx]
     corr = halpha / halpha_nii
-    plt.imshow(corr)
-    plt.show()
     return halpha
 
 def process_galaxies():
