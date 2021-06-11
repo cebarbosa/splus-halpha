@@ -53,9 +53,15 @@ def calc_halpha_nii_3F(fnu):
 
 def calc_halpha_without_nii(halpha_nii, g_i):
     """ Calculated NII corrected emission with eq. 21 or Vilella-Rojo+ (2015)"""
-    halpha = np.where(g_i <= 0.5,
-                          np.power(halpha_nii, 0.989) * np.power(10, -0.193),
-                          np.power(halpha_nii, 0.954) * np.power(10, -0.753))
+    idx = np.where(halpha_nii < 0)
+    # halpha_nii = np.clip(halpha_nii, 0, np.infty)
+    halpha = np.power(10, np.where((g_i <= 0.5),
+                          0.989 * np.log10(halpha_nii) -0.193,
+                          0.954 * np.log10(halpha_nii) -0.753))
+    halpha[idx] = halpha_nii[idx]
+    corr = halpha / halpha_nii
+    plt.imshow(corr)
+    plt.show()
     return halpha
 
 def process_galaxies():
@@ -90,7 +96,6 @@ def process_galaxies():
         
         magAB = -2.5 * np.log10(fnu) - 48.6
         g_i = magAB[3] - magAB[2]
-        g_i[np.isnan(g_i)] = 0.1
 
         wave = 6614.0 * u.Angstrom
         """" C = E(B-V) extinction law  with  eq. 20 or Vilella-Rojo+ (2015)"""
@@ -119,6 +124,8 @@ def process_galaxies():
         plt.imshow(halpha_nii_corr, vmax=vmax, vmin=vmin, origin="lower")
         plt.colorbar()
         plt.subplot(1,3,3)
+        vmax = np.percentile(halpha, 95)
+        vmin = np.percentile(halpha, 10)
         plt.imshow(halpha, vmin=vmin, vmax=vmax, origin="lower")
         plt.colorbar()
         plt.show()
