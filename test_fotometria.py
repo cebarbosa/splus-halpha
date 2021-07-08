@@ -13,26 +13,28 @@ from astropy.table import Table
 import matplotlib.pyplot as plt
 from astropy.io import fits
 import astropy.units as u
-import context
 from photutils import CircularAperture
 from photutils import aperture_photometry
 from photutils.datasets import make_100gaussians_image
 from photutils import CircularAperture, CircularAnnulus
+import context
 
 data_dir = os.path.join(context.data_dir, "FCC_halpha")
-galaxies = os.listdir(data_dir) 
+galaxies = os.listdir(data_dir)
+print(galaxies)
 
 for galaxy in galaxies:
     wdir = os.path.join(data_dir, galaxy)
     os.chdir(wdir)
     cubename = [x for x in os.listdir(wdir) if x.endswith("pix.fits")][0]
+    print(cubename)
+    input()
     # Loading data
     data = fits.getdata(cubename, ext=1)
     t = Table.read(cubename)
     t['FILTER'].tolist()
     idx = t['FILTER'].tolist().index('R')
     rband = data[idx, :, : ]
-   
     #Creating Aperture Objects
     positions =  np.array([0.5 * rband.shape[0], 0.5 * rband.shape[1]])
     radii = np.linspace(1, rband.shape[0] / 2., 30)
