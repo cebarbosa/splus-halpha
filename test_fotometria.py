@@ -28,7 +28,6 @@ for galaxy in galaxies:
     os.chdir(wdir)
     cubename = [x for x in os.listdir(wdir) if x.endswith("pix.fits")][0]
     print(cubename)
-    input()
     # Loading data
     data = fits.getdata(cubename, ext=1)
     t = Table.read(cubename)
