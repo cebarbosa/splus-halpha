@@ -6,6 +6,8 @@ Created on Tue Feb 23 11:55:09 2021
 """
 
 import os
+import shutil
+
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy.table import QTable
@@ -20,15 +22,16 @@ from photutils import CircularAperture, CircularAnnulus
 import context
 
 data_dir = os.path.join(context.data_dir, "FCC_halpha")
-galaxies = os.listdir(data_dir)
-print(galaxies)
-
+galaxies = sorted(os.listdir(data_dir))
 for galaxy in galaxies:
+    print(galaxy)
     wdir = os.path.join(data_dir, galaxy)
     os.chdir(wdir)
-    cubename = [x for x in os.listdir(wdir) if x.endswith("pix.fits")][0]
-    print(cubename)
-    input()
+    try:
+        cubename = [x for x in os.listdir(wdir) if x.endswith("pix.fits")][0]
+    except IndexError:
+        shutil.rmtree(wdir)
+        continue
     # Loading data
     data = fits.getdata(cubename, ext=1)
     t = Table.read(cubename)
@@ -40,13 +43,21 @@ for galaxy in galaxies:
     radii = np.linspace(1, rband.shape[0] / 2., 30)
     # apertures = [CircularAperture(positions, r=r) for r in radii]
     apertures = []
+    plt.subplot(1,2,1)
+    vmin = np.percentile(rband, 10)
+    vmax = np.percentile(rband, 95)
+    plt.imshow(rband, vmin=vmin, vmax=vmax)
     for r in radii:
         aperture = CircularAperture(positions, r=r)
         apertures.append(aperture)
+        aperture.plot(color='r', lw=1)
+    plt.subplot(1,2,2)
     # Performing Aperture Photometry
     phot_table = aperture_photometry(rband, apertures)
     # Lendo os valores da table
     phot = [float(phot_table["aperture_sum_{}".format(i)]) for i in range(30)]
+    table = Table([radii, phot], names=["r", "photsum"])
+    table.write("photometry_R.fits", overwrite=True)
     plt.plot(radii, phot, "o")
     plt.savefig('CUBE_FOTOMETRIA_R.png')
     plt.show()
