@@ -1,4 +1,3 @@
-
 import os
 
 from astropy.io import fits
@@ -37,5 +36,3 @@ if __name__ == "__main__":
         plt.imshow(fluxTwoBands, origin="lower", vmax=vmax, vmin=vmin)
         plt.colorbar()
         plt.show()
-
-
