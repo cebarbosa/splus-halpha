@@ -18,8 +18,9 @@ if __name__ == "__main__":
                          "tables/Literature_new_phot_structural_parameters_8arcsec_class_star.fits")
     table = Table.read(tablename)
     colunas = list(table.columns)
-
-    galaxies = table["ID"].data
+    print(colunas)
+    print(table)
+    galaxies = table["NUMBER"].data
     ra = table["RA_1"].data
     dec = table["DEC_1"].data
     coords = [[r,d] for r,d in zip(ra, dec)]
@@ -33,7 +34,7 @@ if __name__ == "__main__":
     # Connect with S-PLUS
     username = getpass.getuser()  # Change to your S-PLUS username
     password = getpass.getpass(f"Password for {username}:")
-    conn = splusdata.connect(username, password)
+    conn = splusdata.connect('jessica', '11298452')
     # conn = None
     for galaxy, coord, size in zip(galaxies, coords, sizes):
         gal_dir = os.path.join(wdir, galaxy)
