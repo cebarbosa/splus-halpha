@@ -15,7 +15,7 @@ from halpha_3filters_corrections import dust_correction, nii_correction
 if __name__ == "__main__":
     wdir = os.path.join(context.data_dir, "FCC_halpha")
     tablename = os.path.join(context.home_dir,
-                         "tables/Fornax_Sample_3arcsec_pz_zs_class_xmatch.csv")
+                         "Literature_new_phot_structural_parameters_8arcsec_class_star.fits")
     table = Table.read(tablename)
     galaxies = table["ID"].data
     ra = table["RA"].data
