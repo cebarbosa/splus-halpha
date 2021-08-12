@@ -2,7 +2,7 @@ import os
 import getpass 
 import sys # For authentication
 import splusdata
-
+import pandas as pd
 import numpy as np
 import astropy.units as u
 from astropy.io import fits
@@ -39,22 +39,21 @@ if __name__ == "__main__":
     #           ['02:46:25.15', '-00:29:55.45']]
     sizes = [256] * len(galaxies)  # Assume pixels if units is not specified
     # Connect with S-PLUS
-    username = 'jessica' # Change to your S-PLUS username
-    password = getpass.getpass(f"Password for {username}:")
-    conn = splusdata.connect('jessica', 11298452)
-    # conn = None
+    username = getpass.getuser()  # Change to your S-PLUS username
+    password = getpass.getpass(f"Password for {'jessica'}:")
+    conn = splusdata.connect("jessica", 11298452)
     for galaxy, coord, size in zip(galaxies, coords, sizes):
         # galaxy1 = galaxy.astype(str)
         # print(galaxy1)
         gal_dir = os.path.join(wdir, galaxy)
-        
+        print(gal_dir)
+        print(galaxy)
         if not os.path.exists(gal_dir):
             os.mkdir(gal_dir)
         halpha_img = os.path.join(gal_dir, f"{galaxy}_{size}x"
                                         f"{size}pix_halpha.fits")
         # Main routine to download the datacube.
-        scube = SCube(galaxy, coord, size, conn=conn,
-                      coord_unit=(u.degree, u.degree), wdir=gal_dir)
+        scube = SCube(galaxy, coord, size, conn=conn, coord_unit=(u.degree, u.degree), wdir=gal_dir)
         print(scube)
         scube.download_stamps()
         scube.make_cube()
