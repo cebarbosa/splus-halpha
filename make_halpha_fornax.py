@@ -1,29 +1,36 @@
 import os
-import getpass  # For authentication
+import getpass 
+import sys # For authentication
+import splusdata
 
 import numpy as np
 import astropy.units as u
 from astropy.io import fits
 from astropy.table import Table
-import matplotlib.pyplot as plt
-import splusdata  # To access the S-PLUS database
+import matplotlib.pyplot as plt # To access the S-PLUS database
 from splus_ifusci import SCube, make_RGB_with_overlay
 
 import context
 from halpha_3filters_corrections import dust_correction, nii_correction
 
 if __name__ == "__main__":
-    wdir = os.path.join(context.data_dir, "FCC_halpha")
+    wdir = os.path.join(context.home_dir, "FCC_halpha")
     tablename = os.path.join(context.home_dir,
                          "tables/Literature_new_phot_structural_parameters_8arcsec_class_star.fits")
     table = Table.read(tablename)
-    colunas = list(table.columns)
-    print(colunas)
-    print(table)
-    galaxies = table["NUMBER"].data
+    
+    # colunas = list(table.columns)
+    galaxies =str(table["NUMBER"].data)
+    
+    # res = galaxies.astype(str)
+    # print(type(res))
+    # print(type(galaxies)) 
     ra = table["RA_1"].data
+    #print(type(ra))
     dec = table["DEC_1"].data
+    #print(type(dec))
     coords = [[r,d] for r,d in zip(ra, dec)]
+    
     if not os.path.exists(wdir):
         os.mkdir(wdir)
     # Specifying your object
@@ -32,12 +39,15 @@ if __name__ == "__main__":
     #           ['02:46:25.15', '-00:29:55.45']]
     sizes = [256] * len(galaxies)  # Assume pixels if units is not specified
     # Connect with S-PLUS
-    username = getpass.getuser()  # Change to your S-PLUS username
+    username = 'jessica' # Change to your S-PLUS username
     password = getpass.getpass(f"Password for {username}:")
-    conn = splusdata.connect('jessica', '11298452')
+    conn = splusdata.connect('jessica', 11298452)
     # conn = None
     for galaxy, coord, size in zip(galaxies, coords, sizes):
+        # galaxy1 = galaxy.astype(str)
+        # print(galaxy1)
         gal_dir = os.path.join(wdir, galaxy)
+        
         if not os.path.exists(gal_dir):
             os.mkdir(gal_dir)
         halpha_img = os.path.join(gal_dir, f"{galaxy}_{size}x"
@@ -45,6 +55,7 @@ if __name__ == "__main__":
         # Main routine to download the datacube.
         scube = SCube(galaxy, coord, size, conn=conn,
                       coord_unit=(u.degree, u.degree), wdir=gal_dir)
+        print(scube)
         scube.download_stamps()
         scube.make_cube()
         # Processing the data
