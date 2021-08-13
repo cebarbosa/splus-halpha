@@ -13,6 +13,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from astropy.table import QTable
 from astropy.table import Table
+from astropy.io import ascii
 import matplotlib.pyplot as plt
 from astropy.io import fits
 from astropy.wcs import WCS
@@ -27,6 +28,8 @@ import context
 
 data_dir = os.path.join(context.data_dir, "FCC_halpha")
 galaxies = sorted(os.listdir(data_dir))
+username = input("Login for SPLUS cloud:") # Change to your S-PLUS usernam
+password = getpass.getpass(f"Password for {username}:")
 for galaxy in galaxies:
     # TODO: Adaptar da banda r para images halpha
     wdir = os.path.join(data_dir, galaxy)
@@ -50,9 +53,7 @@ for galaxy in galaxies:
     plt.subplot(1,2,2)
     # TODO: FAzer máscara para estrelas
     # 1) Fazer query na região da imagem para achar as estrela próximas
-   
-    username = 'jessica'  # Change to your S-PLUS username
-    password = getpass.getpass(f"Password for {username}:")
+
     conn = splusdata.connect(username, password)
     table = conn.query('select id, ra, dec from dr2.detection_image where ra + dec > 200')
     tab = pd.read_csv(context.home_dir,"tables/Fornax_Sample_3arcsec_pz_zs_class_xmatch.csv")

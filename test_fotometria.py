@@ -52,8 +52,12 @@ for galaxy in galaxies:
         apertures.append(aperture)
         aperture.plot(color='r', lw=1)
     plt.subplot(1,2,2)
+    # Colocar código para máscara aqui
+    ###
+    ###
+    mask = np.zeros_like(rband)
     # Performing Aperture Photometry
-    phot_table = aperture_photometry(rband, apertures)
+    phot_table = aperture_photometry(rband, apertures, mask=mask)
     # Lendo os valores da table
     phot = [float(phot_table["aperture_sum_{}".format(i)]) for i in range(30)]
     table = Table([radii, phot], names=["r", "photsum"])

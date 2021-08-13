@@ -6,6 +6,7 @@ import astropy.units as u
 from astropy.io import fits
 from astropy.table import Table
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 import splusdata  # To access the S-PLUS database
 from splus_ifusci import SCube, make_RGB_with_overlay
 
@@ -33,7 +34,7 @@ if __name__ == "__main__":
     password = getpass.getpass(f"Password for {username}:")
     conn = splusdata.connect(username, password)
     # conn = None
-    for galaxy, coord, size in zip(galaxies, coords, sizes):
+    for galaxy, coord, size in tqdm(zip(galaxies, coords, sizes)):
         gal_dir = os.path.join(wdir, galaxy)
         if not os.path.exists(gal_dir):
             os.mkdir(gal_dir)
@@ -42,6 +43,9 @@ if __name__ == "__main__":
         # Main routine to download the datacube.
         scube = SCube(galaxy, coord, size, conn=conn,
                       coord_unit=(u.degree, u.degree), wdir=gal_dir)
+        output = scube.cubename.replace(".fits", "_halpha.fits")
+        if os.path.exists(output):
+            continue
         scube.download_stamps()
         scube.make_cube()
         # Processing the data
@@ -56,7 +60,6 @@ if __name__ == "__main__":
         halpha = nii_correction(halpha_nii, g_i)
         halpha_err = nii_correction(halpha_nii_err, g_i)
         # Saving fits
-        output = scube.cubename.replace(".fits", "_halpha.fits")
         h = fits.getheader(os.path.join(scube.cutouts_dir, scube.cutnames[0]),
                            ext=1)
         h["EXTNAME"] = "DATA"
