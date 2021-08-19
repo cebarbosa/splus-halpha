@@ -13,6 +13,7 @@ elif getpass.getuser() == "amori":
 data_dir = os.path.join(home_dir, "data")
 if not os.path.exists(data_dir):
     os.mkdir(data_dir)
+    print(data_dir)
 
 bands = ['U', 'F378', 'F395', 'F410', 'F430', 'G', 'F515', 'R', 'F660', 'I',
          'F861', 'Z']
