@@ -40,14 +40,16 @@ for galaxy in galaxies:
     wdir = os.path.join(data_dir, galaxy)
     os.chdir(wdir)
     filename =[x for x in os.listdir(wdir) if x.endswith("halpha.fits")][0]
+    f = fits.open(filename)
     # Loading data
     halpha = fits.getdata(filename, ext=1)
+    w = WCS(f[1].header)
     #Creating Aperture Objects
     positions =  np.array([0.5 * halpha.shape[0], 0.5 * halpha.shape[1]])
     radii = np.linspace(1, halpha.shape[0] / 2., 30)
     # apertures = [CircularAperture(positions, r=r) for r in radii]
     apertures = []
-    plt.subplot(1,2,1)
+    plt.plot(1,2,1)
     vmin = np.percentile(halpha, 10)
     vmax = np.percentile(halpha, 95)
     plt.imshow(halpha, vmin=vmin, vmax=vmax)
@@ -55,7 +57,7 @@ for galaxy in galaxies:
         aperture = CircularAperture(positions, r=r)
         apertures.append(aperture)
         aperture.plot(color='r', lw=1)
-        plt.subplot(1,2,2)
+        plt.plot(1,2,2)
     # TODO: FAzer máscara para estrelas
     # 1) Fazer query na região da imagem para achar as estrela próximas
 
@@ -65,7 +67,6 @@ for galaxy in galaxies:
     r = np.sqrt(2) * size * ps # arcsec
     r = (r.to(u.degree).value)
 
-
     tablename = os.path.join(context.home_dir,
                      "tables/Literature_new_phot_structural_parameters_8arcsec_class_star.fits")
     table = Table.read(tablename)
@@ -74,35 +75,39 @@ for galaxy in galaxies:
         ra0 = t["ALPHA_J2000"]
         dec0 = t["DELTA_J2000"]
         
-        qtable = f"""SELECT det.ID, det.ra, det.dec 
+        qtable = conn.query(f"""SELECT det.ID, det.ra, det.dec 
                  FROM dr2.detection_image as det  
                  JOIN dr2_vacs.star_galaxy_quasar as sgq ON (sgq.ID = det.ID)
-                 WHERE (sgq.PROB_STAR>0.8) AND 1=CONTAINS( POINT('ICRS', det.ra, det.dec), CIRCLE('ICRS', {ra0}, {dec0}, {r}) )"""
+                 WHERE (sgq.PROB_STAR>0.8) AND 1=CONTAINS( POINT('ICRS', det.ra, det.dec), CIRCLE('ICRS', {ra0}, {dec0}, {r}) )""")
        
-        Result = conn.query(qtable)
-    
-        for i in Result:
-            ra = qtable["RA"].data
-            dec = qtable["DEC"].data
+        #for i in Result:
+        ra = qtable["RA"].data
+        dec = qtable["DEC"].data
+        sky = w.pixel_to_world(ra, dec)
             
-            
-            mean, median, std = sigma_clipped_stats(halpha, sigma=3.0)
-            daofind = DAOStarFinder(fwhm=3.0, threshold=5.*std) 
-            sources = daofind(halpha - median) 
-            mask = np.zeros_like(halpha).astype(np.bool)
-            rstars = 15
-            
-            
-            idx = np.where(r < rstars)
-            mask[idx] = True
+        mean, median, std = sigma_clipped_stats(halpha, sigma=3.0)
+        daofind = DAOStarFinder(fwhm=3.0, threshold=5.*std) 
+        sources = daofind(halpha - median) 
         
-            masked_data = halpha[:]
-            masked_data[mask] = median
-            plt.imshow(masked_data, origin="lower", vmax=vmax, vmin=vmin)
-            cbar = plt.colorbar()
-            cbar.set_label("Fluxo instrumental")
-            plt.tight_layout() # Usar bordas de maneira mais eficientemente.
-            plt.show()
+        xdim, ydim = halpha.shape
+        x0 = xdim / 2.
+        y0 = ydim / 2.
+        print(x0,y0)
+        mask = np.zeros_like(halpha).astype(np.bool)
+        print(mask)
+        rstars = 15
+            
+            
+        idx = np.where(r < rstars)
+        mask[idx] = True
+        
+        masked_data = halpha[:]
+        masked_data[mask] = median
+        plt.imshow(masked_data, origin="lower", vmax=vmax, vmin=vmin)
+        cbar = plt.colorbar()
+        cbar.set_label("Fluxo instrumental")
+        plt.tight_layout() # Usar bordas de maneira mais eficientemente.
+        plt.show()
 ########Pixel Masking##############################
     
 
