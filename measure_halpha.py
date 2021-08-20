@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Feb 23 11:55:09 2021
-
 @author: 55119
 """
 
@@ -19,15 +18,9 @@ from astropy.coordinates import SkyCoord
 import astropy.units as u
 from photutils import CircularAperture, CircularAnnulus
 from astropy.stats import sigma_clipped_stats
-<<<<<<< HEAD
-from photutils import datasets
-from photutils import DAOStarFinder
-import splusdata 
-=======
 from photutils import DAOStarFinder
 import splusdata
 
->>>>>>> 45590459602422800a57d94bec5d98589ce75db4
 import context
 import make_halpha_fornax
 
@@ -66,11 +59,7 @@ for galaxy in galaxies:
     conn = splusdata.connect(username, password)
     ps = 0.55 * u.arcsec / u.pix
     size = 256 * u.pix
-<<<<<<< HEAD
-    r = np.sqrt(2) * size * ps # arcsec
-=======
     r = np.sqrt(2) / 2 * size * ps # arcsec
->>>>>>> 45590459602422800a57d94bec5d98589ce75db4
     r = (r.to(u.degree).value)
 
     tablename = os.path.join(context.home_dir,
@@ -80,34 +69,17 @@ for galaxy in galaxies:
     for i, t in enumerate(table):
         ra0 = t["ALPHA_J2000"]
         dec0 = t["DELTA_J2000"]
-<<<<<<< HEAD
-        
-        qtable = conn.query(f"""SELECT det.ID, det.ra, det.dec 
-                 FROM dr2.detection_image as det  
-                 JOIN dr2_vacs.star_galaxy_quasar as sgq ON (sgq.ID = det.ID)
-                 WHERE (sgq.PROB_STAR>0.8) AND 1=CONTAINS( POINT('ICRS', det.ra, det.dec), CIRCLE('ICRS', {ra0}, {dec0}, {r}) )""")
-       
-        #for i in Result:
-        ra = qtable["RA"].data
-        dec = qtable["DEC"].data
-        sky = w.pixel_to_world(ra, dec)
-            
-        mean, median, std = sigma_clipped_stats(halpha, sigma=3.0)
-        daofind = DAOStarFinder(fwhm=3.0, threshold=5.*std) 
-        sources = daofind(halpha - median) 
-=======
         qtable = conn.query(f"""SELECT det.ID, det.ra, det.dec 
                  FROM idr3.detection_image as det  
                  JOIN idr3_vacs.star_galaxy_quasar as sgq ON (sgq.ID = det.ID)
                  WHERE (sgq.PROB_STAR>0.8) AND 1=CONTAINS( POINT('ICRS', det.ra, det.dec), CIRCLE('ICRS', {ra0}, {dec0}, {r}) )""")
-       
+
         #for i in Result:
         ra = qtable["RA"].data * u.degree
         dec = qtable["DEC"].data * u.degree
         if len(ra) > 0:
             coord = SkyCoord(ra, dec)
             xpix, ypix = w.world_to_pixel(coord)
->>>>>>> 45590459602422800a57d94bec5d98589ce75db4
         
         xdim, ydim = halpha.shape
         x0 = xdim / 2.
