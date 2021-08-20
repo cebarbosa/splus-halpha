@@ -40,8 +40,10 @@ for galaxy in galaxies:
     wdir = os.path.join(data_dir, galaxy)
     os.chdir(wdir)
     filename =[x for x in os.listdir(wdir) if x.endswith("halpha.fits")][0]
+    f = fits.open(filename)
     # Loading data
     halpha = fits.getdata(filename, ext=1)
+    w = WCS(f[1].header)
     #Creating Aperture Objects
     positions =  np.array([0.5 * halpha.shape[0], 0.5 * halpha.shape[1]])
     radii = np.linspace(1, halpha.shape[0] / 2., 30)
@@ -65,7 +67,6 @@ for galaxy in galaxies:
     r = np.sqrt(2) * size * ps # arcsec
     r = (r.to(u.degree).value)
 
-
     tablename = os.path.join(context.home_dir,
                      "tables/Literature_new_phot_structural_parameters_8arcsec_class_star.fits")
     table = Table.read(tablename)
@@ -82,10 +83,9 @@ for galaxy in galaxies:
         #for i in Result:
         ra = qtable["RA"].data
         dec = qtable["DEC"].data
+        sky = w.pixel_to_world(ra, dec)
             
-            
-        a= mean, median, std = sigma_clipped_stats(halpha, sigma=3.0)
-        print(a)
+        mean, median, std = sigma_clipped_stats(halpha, sigma=3.0)
         daofind = DAOStarFinder(fwhm=3.0, threshold=5.*std) 
         sources = daofind(halpha - median) 
         
@@ -94,6 +94,7 @@ for galaxy in galaxies:
         y0 = ydim / 2.
         print(x0,y0)
         mask = np.zeros_like(halpha).astype(np.bool)
+        print(mask)
         rstars = 15
             
             
