@@ -25,6 +25,10 @@ if __name__ == "__main__":
     username = input("Login: ")  # Change to your S-PLUS username
     password = getpass.getpass(f"Password:")
     conn = splusdata.connect(username, password)
+    ra = t["ALPHA_J2000"]
+    dec = t["DELTA_J2000"]
+    print("ra=",ra)
+    input()
     for i, t in enumerate(table):
         ra = t["ALPHA_J2000"]
         dec = t["DELTA_J2000"]
