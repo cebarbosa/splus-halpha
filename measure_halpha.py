@@ -23,6 +23,9 @@ from photutils import CircularAperture
 from photutils import aperture_photometry
 from photutils.datasets import make_100gaussians_image
 from photutils import CircularAperture, CircularAnnulus
+from astropy.stats import sigma_clipped_stats
+from photutils import datasets
+from photutils import DAOStarFinder
 import splusdata 
 import context
 import make_halpha_fornax
@@ -52,7 +55,7 @@ for galaxy in galaxies:
         aperture = CircularAperture(positions, r=r)
         apertures.append(aperture)
         aperture.plot(color='r', lw=1)
-    plt.subplot(1,2,2)
+        plt.subplot(1,2,2)
     # TODO: FAzer máscara para estrelas
     # 1) Fazer query na região da imagem para achar as estrela próximas
 
@@ -60,39 +63,60 @@ for galaxy in galaxies:
     ps = 0.55 * u.arcsec / u.pix
     size = 256 * u.pix
     r = np.sqrt(2) * size * ps # arcsec
-    r = r.to(u.degree)
+    r = (r.to(u.degree).value)
+
 
     tablename = os.path.join(context.home_dir,
                      "tables/Literature_new_phot_structural_parameters_8arcsec_class_star.fits")
     table = Table.read(tablename)
+    
     for i, t in enumerate(table):
         ra0 = t["ALPHA_J2000"]
         dec0 = t["DELTA_J2000"]
-        qtable = conn.query(f"""SELECT det.id, det.ra, det.dec 
-                            FROM dr2.detection_image as det 
-                            JOIN dr2_vacs.star_galaxy_quasar as sgq ON (sgq.ID = det.ID)
-                            WHERE (sgq.PROB_STAR>0.8) 
-                            AND 1=CONTAINS( POINT('ICRS', det.ra, det.dec), CIRCLE('ICRS', {ra0}, {dec0}, {r.to(u.degree).value}) )""")
-        print(qtable)
-        input()
+        
+        qtable = f"""SELECT det.ID, det.ra, det.dec 
+                 FROM dr2.detection_image as det  
+                 JOIN dr2_vacs.star_galaxy_quasar as sgq ON (sgq.ID = det.ID)
+                 WHERE (sgq.PROB_STAR>0.8) AND 1=CONTAINS( POINT('ICRS', det.ra, det.dec), CIRCLE('ICRS', {ra0}, {dec0}, {r}) )"""
+       
+        Result = conn.query(qtable)
+    
+        for i in Result:
+            ra = qtable["RA"].data
+            dec = qtable["DEC"].data
+            
+            
+            mean, median, std = sigma_clipped_stats(halpha, sigma=3.0)
+            daofind = DAOStarFinder(fwhm=3.0, threshold=5.*std) 
+            sources = daofind(halpha - median) 
+            mask = np.zeros_like(halpha).astype(np.bool)
+            rstars = 15
+            
+            
+            idx = np.where(r < rstars)
+            mask[idx] = True
+        
+            masked_data = halpha[:]
+            masked_data[mask] = median
+            plt.imshow(masked_data, origin="lower", vmax=vmax, vmin=vmin)
+            cbar = plt.colorbar()
+            cbar.set_label("Fluxo instrumental")
+            plt.tight_layout() # Usar bordas de maneira mais eficientemente.
+            plt.show()
 ########Pixel Masking##############################
     
-    #hdul = fits.open(filename)
-    # hdr = WCS(hdul[1].header)
-    # print("hdr=",hdr)
-    # sky = hdr.pixel_to_world(ra, dec)
-    # print(sky)
+
     # 2) Fazer máscara das estrelas encontradas na query baseada no código
     # test_mascara.py
     # # ) Passar máscara como argumento do aperture_photometry
     ### Exemplo
    # mask = np.zeros_like(halpha)
     # Performing Aperture Photometry
-    phot_table = aperture_photometry(halpha, apertures, mask=mask)
+    #phot_table = aperture_photometry(halpha, apertures, mask=mask)
     # Lendo os valores da table
-    phot = [float(phot_table["aperture_sum_{}".format(i)]) for i in range(30)]
-    table = Table([radii, phot], names=["sma", "halpha"])
-    table.write("photometry_halpha.fits", overwrite=True)
-    plt.plot(radii, phot, "o")
-    plt.savefig('CUBE_FOTOMETRIA_Halpha.png')
-    plt.show()
+   # phot = [float(phot_table["aperture_sum_{}".format(i)]) for i in range(30)]
+    # table = Table([radii, phot], names=["sma", "halpha"])
+    # table.write("photometry_halpha.fits", overwrite=True)
+    # plt.plot(radii, phot, "o")
+    # plt.savefig('CUBE_FOTOMETRIA_Halpha.png')
+    # plt.show()
