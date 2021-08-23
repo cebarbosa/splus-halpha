@@ -16,6 +16,8 @@ from astropy.io import fits
 from astropy.wcs import WCS
 from astropy.coordinates import SkyCoord
 import astropy.units as u
+from photutils import CircularAperture
+from photutils import aperture_photometry
 from photutils import CircularAperture, CircularAnnulus
 from astropy.stats import sigma_clipped_stats
 from photutils import DAOStarFinder
@@ -30,7 +32,6 @@ username = input("Login for SPLUS cloud:") # Change to your S-PLUS usernam
 password = getpass.getpass(f"Password for {username}:")
 
 for galaxy in galaxies:
-    print(galaxy)
     # TODO: Adaptar da banda r para images halpha
     wdir = os.path.join(data_dir, galaxy)
     os.chdir(wdir)
@@ -39,20 +40,26 @@ for galaxy in galaxies:
     # Loading data
     halpha = fits.getdata(filename, ext=1)
     w = WCS(f[1].header)
+    
+    vmin = np.percentile(halpha, 10)
+    vmax = np.percentile(halpha, 95)
+    img = plt.imshow(halpha, origin="lower", vmin=vmin, vmax=vmax)
+    plt.colorbar()
+    plt.show()
+    
     #Creating Aperture Objects
     positions =  np.array([0.5 * halpha.shape[0], 0.5 * halpha.shape[1]])
     radii = np.linspace(1, halpha.shape[0] / 2., 30)
     # apertures = [CircularAperture(positions, r=r) for r in radii]
     apertures = []
     plt.plot(1,2,1)
-    vmin = np.percentile(halpha, 10)
-    vmax = np.percentile(halpha, 95)
-    plt.imshow(halpha, vmin=vmin, vmax=vmax)
+    
     for r in radii:
         aperture = CircularAperture(positions, r=r)
         apertures.append(aperture)
         aperture.plot(color='r', lw=1)
         plt.plot(1,2,2)
+        
     # TODO: FAzer máscara para estrelas
     # 1) Fazer query na região da imagem para achar as estrela próximas
 
@@ -80,26 +87,20 @@ for galaxy in galaxies:
         if len(ra) > 0:
             coord = SkyCoord(ra, dec)
             xpix, ypix = w.world_to_pixel(coord)
-        
-        xdim, ydim = halpha.shape
-        x0 = xdim / 2.
-        y0 = ydim / 2.
-        print(x0,y0)
-        mask = np.zeros_like(halpha).astype(np.bool)
-        print(mask)
-        rstars = 15
             
-            
-        idx = np.where(r < rstars)
-        mask[idx] = True
-        
-        masked_data = halpha[:]
-        masked_data[mask] = median
-        plt.imshow(masked_data, origin="lower", vmax=vmax, vmin=vmin)
-        cbar = plt.colorbar()
-        cbar.set_label("Fluxo instrumental")
-        plt.tight_layout() # Usar bordas de maneira mais eficientemente.
-        plt.show()
+    mean, median, std = sigma_clipped_stats(halpha, sigma=3.0)       
+    daofind = DAOStarFinder(fwhm=3.0, threshold=5.*std) 
+    sources = daofind(halpha - median) 
+    daofind = DAOStarFinder(fwhm=3.0, threshold=5.*std) 
+    sources = daofind(halpha - median)
+    mean, median, std = sigma_clipped_stats(halpha, sigma=3.0)
+    mask = np.zeros_like(halpha).astype(np.bool)
+      
+    masked_data = halpha[:]
+    masked_data[mask] = median
+    plt.imshow(masked_data, origin="lower", vmax=vmax, vmin=vmin)
+    plt.colorbar()
+    plt.show()
 ########Pixel Masking##############################
     
 
