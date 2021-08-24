@@ -76,6 +76,7 @@ for galaxy in galaxies:
     x = np.arange(xdim)
     y = np.arange(ydim)
     xx, yy = np.meshgrid(x, y)
+    print( xx, yy)
     
     mask = np.zeros_like(data).astype(np.bool)
     rstars = 15

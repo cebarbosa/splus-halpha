@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Feb 23 11:55:09 2021
-
 @author: 55119
 """
 
@@ -17,6 +16,10 @@ from astropy.io import fits
 from astropy.wcs import WCS
 from astropy.coordinates import SkyCoord
 import astropy.units as u
+from astropy.visualization import SqrtStretch
+from astropy.visualization.mpl_normalize import ImageNormalize
+from photutils.aperture import CircularAperture
+from photutils import CircularAperture
 from photutils import aperture_photometry
 from photutils import CircularAperture, CircularAnnulus
 from astropy.stats import sigma_clipped_stats
