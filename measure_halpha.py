@@ -16,6 +16,9 @@ from astropy.io import fits
 from astropy.wcs import WCS
 from astropy.coordinates import SkyCoord
 import astropy.units as u
+from astropy.visualization import SqrtStretch
+from astropy.visualization.mpl_normalize import ImageNormalize
+from photutils.aperture import CircularAperture
 from photutils import CircularAperture
 from photutils import aperture_photometry
 from photutils import CircularAperture, CircularAnnulus
@@ -87,20 +90,27 @@ for galaxy in galaxies:
         if len(ra) > 0:
             coord = SkyCoord(ra, dec)
             xpix, ypix = w.world_to_pixel(coord)
-            
-    mean, median, std = sigma_clipped_stats(halpha, sigma=3.0)       
-    daofind = DAOStarFinder(fwhm=3.0, threshold=5.*std) 
-    sources = daofind(halpha - median) 
-    daofind = DAOStarFinder(fwhm=3.0, threshold=5.*std) 
-    sources = daofind(halpha - median)
-    mean, median, std = sigma_clipped_stats(halpha, sigma=3.0)
-    mask = np.zeros_like(halpha).astype(np.bool)
+        positions = np.transpose((qtable["RA"], qtable["DEC"]))
+        print(positions)
+        apertures = CircularAperture(positions, r=r)
+        norm = ImageNormalize(stretch=SqrtStretch())
+        plt.imshow(halpha, cmap='Greys', origin='lower', norm=norm, interpolation='nearest')
+        apertures.plot(color='blue', lw=1.5, alpha=0.5)
+    # #mean, median, std = sigma_clipped_stats(halpha, sigma=3.0)       
+    # #daofind = DAOStarFinder(fwhm=3.0, threshold=5.*std) 
+    # sources = daofind(halpha - median) 
+    # daofind = DAOStarFinder(fwhm=3.0, threshold=5.*std) 
+    # sources = daofind(halpha - median)
+    
+    #     mask = np.zeros_like(halpha)
+    #     print(mask)
+    #     input()
       
-    masked_data = halpha[:]
-    masked_data[mask] = median
-    plt.imshow(masked_data, origin="lower", vmax=vmax, vmin=vmin)
-    plt.colorbar()
-    plt.show()
+    # masked_data = halpha[:]
+    # masked_data[mask] = median
+    # plt.imshow(masked_data, origin="lower", vmax=vmax, vmin=vmin)
+    # plt.colorbar()
+    # plt.show()
 ########Pixel Masking##############################
     
 
