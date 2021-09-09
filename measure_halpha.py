@@ -40,7 +40,7 @@ def make_halpha_image(halpha, galaxy):
     plt.colorbar()
     plt.xlabel("X (pix)")
     plt.ylabel("Y (pix)")
-    plt.savefig(f"{galaxy}_halpha.png", dpi=250)
+    #plt.savefig(f"{galaxy}_halpha.png", dpi=250)
     plt.close()
 
 if __name__ == "__main__":
@@ -96,27 +96,34 @@ if __name__ == "__main__":
         # apertures = [CircularAperture(positions, r=r) for r in radii]
         apertures = []
         plt.subplot(1, 2, 1)
+        plt.title("Fluxo H-alfa")
+        plt.xlabel('raio (px)')
+        plt.xlabel('raio (px)')
         vmin = np.percentile(halpha, 10)
         vmax = np.percentile(halpha, 95)
-        plt.title("Fluxo H-alfa")
         plt.imshow(halpha, vmin=vmin, vmax=vmax)
         for r in radii:
             aperture = CircularAperture(positions, r=r)
             apertures.append(aperture)
             aperture.plot(color='r', lw=1)
+        print(r)
         plt.subplot(1, 2, 2)
         phot_table = aperture_photometry(halpha, apertures, mask=mask)
+        print(phot_table)
         # Lendo os valores da tabela
         phot = [float(phot_table["aperture_sum_{}".format(i)]) for i in
                 range(30)]
         table = Table([radii, phot], names=["sma", "halpha"])
         table.write("photometry_halpha.fits", overwrite=True)
         plt.title("Fotometria")
+        plt.xlabel('raio (pixel)')
+        plt.ylabel('Brilho Superficial instrumental')
         plt.plot(radii, phot, "o")
-        plt.savefig('halpha_photometry.png')
         plt.show()
+        #plt.savefig('halpha_photometry.png')
         
-########Pixel Masking##############################
+        
+# ########Pixel Masking##############################
     
 
     # 2) Fazer máscara das estrelas encontradas na query baseada no código

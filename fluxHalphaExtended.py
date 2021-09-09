@@ -15,12 +15,7 @@ import numpy as np
 import splusdata
 
 
-path= ["C:/Users/55119/Dropbox/splus-halpha (1)/data/11HUGS/cutouts/UGCA193",
-       "C:/Users/55119/Dropbox/splus-halpha (1)/data/11HUGS/cutouts/ESO302-G014",
-       "C:/Users/55119/Dropbox/splus-halpha (1)/data/11HUGS/cutouts/NGC3115",
-       "C:/Users/55119/Dropbox/splus-halpha (1)/data/11HUGS/cutouts/SextansA"]
-
-
+path= ["C:/Users/55119/Dropbox/splus-halpha (1)/FCC_halpha/Fornax10201.pix"]
 
 for x in range(len(path)):
     
@@ -92,32 +87,32 @@ for x in range(len(path)):
         plt.colorbar()
         plt.show()
         
-        #############   For 3 Filters    ####################
+   #      #############   For 3 Filters    ####################
     
-        COEFS=fits.open("file:///c:/Users/55119/Dropbox/splus-halpha (1)/tables/coeffs.fits")
+   #      COEFS=fits.open("file:///c:/Users/55119/Dropbox/splus-halpha (1)/tables/coeffs.fits")
    
-        t = Table.read(COEFS)
+   #      t = Table.read(COEFS)
     
-        alpha_F660=t['alpha_x'][0]
-        beta_F660=t['beta_x'][0]
-        delta_F660=t['delta_x'][0]
+   #      alpha_F660=t['alpha_x'][0]
+   #      beta_F660=t['beta_x'][0]
+   #      delta_F660=t['delta_x'][0]
 
-        alpha_I=t['alpha_x'][1]
-        beta_I=t['beta_x'][1]
-        delta_I=t['delta_x'][1]
+   #      alpha_I=t['alpha_x'][1]
+   #      beta_I=t['beta_x'][1]
+   #      delta_I=t['delta_x'][1]
 
-        alpha_R=t['alpha_x'][2]
-        beta_R=t['beta_x'][2]
-        delta_R=t['delta_x'][2]
+   #      alpha_R=t['alpha_x'][2]
+   #      beta_R=t['beta_x'][2]
+   #      delta_R=t['delta_x'][2]
 
-        fluxThreeBands = (((fnu_R- fnu_I)-((alpha_R-alpha_I)/(alpha_F660 - alpha_I))*(fnu_F660 - fnu_I))/((beta_F660)*(alpha_I -alpha_R )-(beta_R)))
+   #      fluxThreeBands = (((fnu_R- fnu_I)-((alpha_R-alpha_I)/(alpha_F660 - alpha_I))*(fnu_F660 - fnu_I))/((beta_F660)*(alpha_I -alpha_R )-(beta_R)))
     
-   # fluxThreeBands = (((fnu_R- fnu_I)-((t['alpha_x'][2])-(t['alpha_x'][1]))/((t['alpha_x'][0] )- (t['alpha_x'][2]))*(fnu_F660 - fnu_I))/(((t['beta_x'][0]))*((t['alpha_x'][1]) - (t['alpha_x'][2]) )-((t['beta_x'][2))))
-        vmax = np.nanpercentile(fluxThreeBands, 95)
-        vmin = np.nanpercentile(fluxThreeBands, 80)
-        plt.imshow(fluxThreeBands, origin="lower", vmax=vmax, vmin=vmin)
-        plt.colorbar()
-        plt.show()
+   # # fluxThreeBands = (((fnu_R- fnu_I)-((t['alpha_x'][2])-(t['alpha_x'][1]))/((t['alpha_x'][0] )- (t['alpha_x'][2]))*(fnu_F660 - fnu_I))/(((t['beta_x'][0]))*((t['alpha_x'][1]) - (t['alpha_x'][2]) )-((t['beta_x'][2))))
+   #      vmax = np.nanpercentile(fluxThreeBands, 95)
+   #      vmin = np.nanpercentile(fluxThreeBands, 80)
+   #      plt.imshow(fluxThreeBands, origin="lower", vmax=vmax, vmin=vmin)
+   #      plt.colorbar()
+   #      plt.show()
         
      #   print(fileName2)
      #   print(type(fnu))

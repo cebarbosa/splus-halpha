@@ -94,6 +94,7 @@ for galaxy in galaxies:
     plt.imshow(masked_data, origin="lower", vmax=vmax, vmin=vmin)
     cbar = plt.colorbar()
     cbar.set_label("Fluxo instrumental")
+    
     plt.tight_layout() # Usar bordas de maneira mais eficientemente.
     plt.savefig(os.path.join(context.home_dir, "ngc3115_mask.png"))
     plt.show()

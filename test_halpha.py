@@ -36,3 +36,6 @@ if __name__ == "__main__":
         plt.imshow(fluxTwoBands, origin="lower", vmax=vmax, vmin=vmin)
         plt.colorbar()
         plt.show()
+#o que ja vem no python
+#instalados(numpy, astropy)
+#codigos locais
