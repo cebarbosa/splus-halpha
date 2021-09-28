@@ -13,14 +13,14 @@ from astropy.io import fits
 import astropy.units as u
 import numpy as np
 import splusdata
-
+CUPOM: OFFEXTRA OFFEXTRA
 
 path= ["C:/Users/55119/Dropbox/splus-halpha (1)/FCC_halpha/Fornax10201.pix"]
 
 for x in range(len(path)):
     
     os.chdir(path[x])
-    
+    SPLUS-s29s31-50.22486407163766--37.134297664400115-256_R.fits (1)
     result = []
     hAlphaFlux = []
     bands = ['_F660_','_I_','_R_']
@@ -137,3 +137,4 @@ for x in range(len(path)):
         
        # sys.stdout = mainOutput #altera a saída do Python para a saída principal (console)
     
+Usuário: yw5icrr

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 import context
 
-def get_names(wdir):
+def get_names(wdir,bands=["R", "F660", "I"]):
     """ Obtaining names of images  for one directory. """
     filenames = [x for x in os.listdir(wdir) if x.endswith("_swp.fits")]
     names = []
