@@ -64,7 +64,7 @@ def dust_correction(halpha, g_i):
     plt.imshow(dust, origin="lower", vmax=vmax, vmin=vmin)
     plt.colorbar()
     plt.show()
-    input()
+ 
 def test_halpha():
     data_dir = os.path.join(context.data_dir, "11HUGS/cutouts")
     galaxies = os.listdir(data_dir)
@@ -86,17 +86,20 @@ def test_halpha():
         vmax = np.percentile(halpha_nii_dust, 95)
         vmin = np.percentile(halpha_nii_dust, 10)
         plt.subplot(1,3,1)
+        plt.title(" H-alfa + Nii")
         plt.imshow(halpha_nii_dust, vmax=vmax, vmin=vmin, origin="lower")
         plt.colorbar()
         plt.subplot(1,3,2)
+        plt.title("H-alfa + Nii sem Poeira")
         plt.imshow(halpha_nii, vmax=vmax, vmin=vmin, origin="lower")
         plt.colorbar()
         plt.subplot(1,3,3)
-        
+        plt.title("H-alfa sem Nii")   
         vmax = np.percentile(halpha, 95)
         vmin = np.percentile(halpha, 10)
         plt.imshow(halpha, vmin=vmin, vmax=vmax, origin="lower")
         plt.colorbar()
+        plt.savefig("correção Nii e Via Lactea.png")
         plt.show()
 
 if __name__ == "__main__":

@@ -40,12 +40,8 @@ def make_halpha_image(halpha, galaxy):
     plt.colorbar()
     plt.xlabel("X (pix)")
     plt.ylabel("Y (pix)")
-<<<<<<< HEAD
-    #plt.savefig(f"{galaxy}_halpha.png", dpi=250)
-=======
     plt.savefig(f"{galaxy}_halpha.png", dpi=250)
->>>>>>> c19b3236651d98a6f4f498c7816bffb56a1084c7
-    plt.close()
+
 
 if __name__ == "__main__":
     data_dir = os.path.join(context.home_dir, "FCC_halpha")
@@ -100,12 +96,9 @@ if __name__ == "__main__":
         # apertures = [CircularAperture(positions, r=r) for r in radii]
         apertures = []
         plt.subplot(1, 2, 1)
-<<<<<<< HEAD
         plt.title("Fluxo H-alfa")
         plt.xlabel('raio (px)')
         plt.xlabel('raio (px)')
-=======
->>>>>>> c19b3236651d98a6f4f498c7816bffb56a1084c7
         vmin = np.percentile(halpha, 10)
         vmax = np.percentile(halpha, 95)
         plt.imshow(halpha, vmin=vmin, vmax=vmax)
@@ -113,21 +106,16 @@ if __name__ == "__main__":
             aperture = CircularAperture(positions, r=r)
             apertures.append(aperture)
             aperture.plot(color='r', lw=1)
-<<<<<<< HEAD
-        print(r)
         plt.subplot(1, 2, 2)
         phot_table = aperture_photometry(halpha, apertures, mask=mask)
-        print(phot_table)
-=======
+  
         plt.subplot(1, 2, 2)
         phot_table = aperture_photometry(halpha, apertures, mask=mask)
->>>>>>> c19b3236651d98a6f4f498c7816bffb56a1084c7
         # Lendo os valores da tabela
         phot = [float(phot_table["aperture_sum_{}".format(i)]) for i in
                 range(30)]
         table = Table([radii, phot], names=["sma", "halpha"])
         table.write("photometry_halpha.fits", overwrite=True)
-<<<<<<< HEAD
         plt.title("Fotometria")
         plt.xlabel('raio (pixel)')
         plt.ylabel('Brilho Superficial instrumental')
@@ -153,8 +141,3 @@ if __name__ == "__main__":
     # plt.plot(radii, phot, "o")
     # plt.savefig('CUBE_FOTOMETRIA_Halpha.png')
     # plt.show()
-=======
-        plt.plot(radii, phot, "o")
-        plt.savefig('halpha_photometry.png')
-        plt.show()
->>>>>>> c19b3236651d98a6f4f498c7816bffb56a1084c7
