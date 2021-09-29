@@ -75,21 +75,27 @@ def test_halpha():
         g_i = magAB[3] - magAB[2]
         halpha_nii = dust_correction(halpha_nii_dust, g_i)
         halpha = nii_correction(halpha_nii, g_i)
-        vmax = np.percentile(halpha_nii_dust, 95)
+        vmax = np.percentile(halpha_nii_dust, 99)
         vmin = np.percentile(halpha_nii_dust, 10)
-        plt.subplot(1,3,1)
-        plt.imshow(halpha_nii_dust, vmax=vmax, vmin=vmin, origin="lower")
-        plt.colorbar()
-        plt.subplot(1,3,2)
-        plt.imshow(halpha_nii, vmax=vmax, vmin=vmin, origin="lower")
-        plt.colorbar()
-        plt.subplot(1,3,3)
-        
-        vmax = np.percentile(halpha, 95)
-        vmin = np.percentile(halpha, 10)
-        plt.imshow(halpha, vmin=vmin, vmax=vmax, origin="lower")
-        plt.colorbar()
+        fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(6.36, 2.),
+            gridspec_kw = {'wspace':0.05, 'hspace':0.05, 'left':0.02,
+                           'right':0.88, "bottom":0.02, "top":0.98})
+        axes[0].imshow(halpha_nii_dust, vmax=vmax, vmin=vmin, origin="lower")
+        axes[0].legend(title=r"H$\alpha$+[NII]+poeira")
+        axes[1].imshow(halpha_nii, vmax=vmax, vmin=vmin, origin="lower",
+                       label="3F+")
+        axes[1].legend(title=r"H$\alpha$+[NII]")
+        im2 = axes[2].imshow(halpha, vmin=vmin, vmax=vmax, origin="lower")
+        axes[2].legend(title=r"H$\alpha$")
+        for ax in axes:
+            ax.get_xaxis().set_ticklabels([])
+            ax.get_yaxis().set_ticklabels([])
+        # add space for colour bar
+        cbar_ax = fig.add_axes([0.91, 0.06, 0.03, 0.85])
+        fig.colorbar(im2, cax=cbar_ax)
+        plt.savefig(f"correcao_{galaxy}.png", dpi=250)
         plt.show()
+        break
 
 if __name__ == "__main__":
     test_halpha()
