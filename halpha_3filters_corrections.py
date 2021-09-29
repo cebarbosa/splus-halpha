@@ -49,6 +49,7 @@ def dust_correction(halpha, g_i):
     wave = 6614.0 * u.Angstrom
     """" C = E(B-V) extinction law  with  eq. 20 or Vilella-Rojo+ (2015)"""
     ebv = np.array(0.206 * np.power(g_i, 1.68) - 0.0457)
+    #ebv = excesso de cor
     ebv[np.isnan(ebv)] = 0
     x = 1 / wave.to(u.micrometer).value
     wtran = (0.63 * u.micrometer)
@@ -56,7 +57,14 @@ def dust_correction(halpha, g_i):
                      2.659 * (-2.156 + 1.509 * x - 0.198 * x * x
                               + 0.011 * (x * x * x)))
     return halpha * np.power(10, -0.4 * ebv * kappa)
+    dust = halpha * np.power(10, -0.4 * ebv * kappa)
 
+    vmax = np.nanpercentile(dust, 95)
+    vmin = np.nanpercentile(dust, 80)
+    plt.imshow(dust, origin="lower", vmax=vmax, vmin=vmin)
+    plt.colorbar()
+    plt.show()
+ 
 def test_halpha():
     data_dir = os.path.join(context.data_dir, "11HUGS/cutouts")
     galaxies = os.listdir(data_dir)
@@ -77,6 +85,7 @@ def test_halpha():
         halpha = nii_correction(halpha_nii, g_i)
         vmax = np.percentile(halpha_nii_dust, 99)
         vmin = np.percentile(halpha_nii_dust, 10)
+        # Making plot
         fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(6.36, 2.),
             gridspec_kw = {'wspace':0.05, 'hspace':0.05, 'left':0.02,
                            'right':0.88, "bottom":0.02, "top":0.98})

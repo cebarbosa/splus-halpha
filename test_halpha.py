@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 import context
 
-def get_names(wdir, bands=["R", "F660", "I"]):
+def get_names(wdir,bands=["R", "F660", "I"]):
     """ Obtaining names of images  for one directory. """
     filenames = [x for x in os.listdir(wdir) if x.endswith("_swp.fits")]
     names = []
@@ -36,3 +36,6 @@ if __name__ == "__main__":
         plt.imshow(fluxTwoBands, origin="lower", vmax=vmax, vmin=vmin)
         plt.colorbar()
         plt.show()
+#o que ja vem no python
+#instalados(numpy, astropy)
+#codigos locais
