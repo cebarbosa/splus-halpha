@@ -25,10 +25,6 @@ if __name__ == "__main__":
     username = input("Login: ")  # Change to your S-PLUS username
     password = getpass.getpass(f"Password:")
     conn = splusdata.connect(username, password)
-    ra = t["ALPHA_J2000"]
-    dec = t["DELTA_J2000"]
-    print("ra=",ra)
-    input()
     for i, t in enumerate(table):
         ra = t["ALPHA_J2000"]
         dec = t["DELTA_J2000"]
@@ -53,16 +49,16 @@ if __name__ == "__main__":
         halpha_obs, halpha_obs_err = scube.calc_halpha(store=True)
         halpha_nii = dust_correction(halpha_obs.value, g_i)
         halpha_nii_err = dust_correction(halpha_obs_err.value, g_i)
-        halpha = nii_correction(halpha_nii, g_i)
-        halpha_err = nii_correction(halpha_nii_err, g_i)
+        # halpha = nii_correction(halpha_nii, g_i)
+        # halpha_err = nii_correction(halpha_nii_err, g_i)
         # Saving fits
         output = scube.cubename.replace(".fits", "_halpha.fits")
         h = fits.getheader(os.path.join(scube.cutouts_dir, scube.cutnames[0]),
                            ext=1)
         h["EXTNAME"] = "DATA"
-        hdu1 = fits.ImageHDU(halpha, h)
+        hdu1 = fits.ImageHDU(halpha_nii, h)
         h["EXTNAME"] = "ERROR"
-        hdu2 = fits.ImageHDU(halpha_err, h)
+        hdu2 = fits.ImageHDU(halpha_nii_err, h)
         hdulist = fits.HDUList([fits.PrimaryHDU(), hdu1, hdu2])
         hdulist.writeto(output, overwrite=True)
         flam = scube.get_flam().value
