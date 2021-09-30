@@ -88,7 +88,10 @@ if __name__ == "__main__":
         ra = qtable["RA"].data * u.degree 
         dec = qtable["DEC"].data * u.degree
         coord = SkyCoord(ra, dec)
-        xpix, ypix = w.world_to_pixel(coord)
+        try:
+            xpix, ypix = w.world_to_pixel(coord)
+        except:
+            continue
         #se o ra não tiver nada dentro passa para o próximo item.
         mask = make_mask(halpha, xpix, ypix)
         halpha[mask==1] = 0 #mascara manual, todos os lugares que tiver estrela, vamos zerar o halpha para não contar no fluxo
@@ -125,24 +128,3 @@ if __name__ == "__main__":
         plt.xlim([0, 100])
         # plt.savefig('halpha_photometry.png')     
         plt.show()
-
-#a mascara foi feita para zerar os valores que não queremos na imagem, 
-#ao somar todos os valores dos pixeis e quando chega na parte mascara por ser zero nõ vai contar nada no fluxo
-
-#a fotometria soma os pixeis e se esta zero a região não vai contar no fluxo
-# ########Pixel Mplt.savefig(asking##############################
-
-    # 2) Fazer máscara das estrelas encontradas na query baseada no código
-    # test_mascara.py
-    # # ) Passar máscara como argumento do aperture_photometry
-    ### Exemplo
-   # mask = np.zeros_like(halpha)
-    # Performing Aperture Photometry
-    #phot_table = aperture_photometry(halpha, apertures, mask=mask)
-    # Lendo os valores da table
-   # phot = [float(phot_table["aperture_sum_{}".format(i)]) for i in range(30)]
-    # table = Table([radii, phot], names=["sma", "halpha"])
-    # table.write("photometry_halpha.fits", overwrite=True)
-    # plt.plot(radii, phot, "o")
-    # plt.savefig('CUBE_FOTOMETRIA_Halpha.png')
-    # plt.show()
